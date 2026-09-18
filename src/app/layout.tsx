@@ -4,6 +4,7 @@ import "./globals.css";
 import DynamicIsland from "@/components/DynamicIsland";
 import HardwareAcceleratedBackground from "@/components/HardwareAcceleratedBackground";
 import GlobalErrorBoundary from "@/components/GlobalErrorBoundary";
+import { AuthProvider } from "@/context/AuthContext";
 
 const playfair = Playfair_Display({ 
   subsets: ["latin"], 
@@ -33,11 +34,13 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" className="dark">
       <body className={`${tajawal.variable} ${playfair.variable} font-sans bg-[#040404] text-[#EAEAEA] antialiased selection:bg-[#D4AF37]/30 selection:text-[#EAEAEA] min-h-screen flex flex-col leading-[1.8]`}>
         <GlobalErrorBoundary>
-          <HardwareAcceleratedBackground />
-          <DynamicIsland />
-          <main className="flex-1 relative z-10 pt-28 pb-12 px-4 sm:px-8 max-w-7xl mx-auto w-full">
-            {children}
-          </main>
+          <AuthProvider>
+            <HardwareAcceleratedBackground />
+            <DynamicIsland />
+            <main className="flex-1 relative z-10 pt-28 pb-12 px-4 sm:px-8 max-w-7xl mx-auto w-full">
+              {children}
+            </main>
+          </AuthProvider>
         </GlobalErrorBoundary>
       </body>
     </html>
