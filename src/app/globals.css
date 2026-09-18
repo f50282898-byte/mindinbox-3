@@ -73,6 +73,9 @@ body {
 .font-serif {
   font-family: var(--font-playfair), var(--font-tajawal), Georgia, serif;
 }
+.font-reem {
+  font-family: var(--font-reem-kufi), sans-serif;
+}
 
 /* ── Low-Fog Glass Components ─────────────────────── */
 .glass {

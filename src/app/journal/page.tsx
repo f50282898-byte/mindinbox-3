@@ -92,11 +92,26 @@ export default function CatharsisJournal() {
     }, 1500);
   };
 
-  const handlePrint = () => {
-    setShowTomeModal(false);
-    setTimeout(() => {
-      window.print();
-    }, 300);
+  const handleExportPDF = async () => {
+    try {
+      const element = document.getElementById('pdf-export-container');
+      if (!element) return;
+      
+      const html2pdf = (await import('html2pdf.js')).default;
+      
+      const opt = {
+        margin:       1,
+        filename:     'مخطوطة-عقل-في-صندوق.pdf',
+        image:        { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in' as const, format: 'letter' as const, orientation: 'portrait' as const }
+      };
+
+      await html2pdf().set(opt).from(element).save();
+      setShowTomeModal(false);
+    } catch (err) {
+      console.error('PDF Export Error:', err);
+    }
   };
 
   return (
@@ -255,7 +270,7 @@ export default function CatharsisJournal() {
 
                 <div className="flex gap-3 pt-2">
                   <button
-                    onClick={handlePrint}
+                    onClick={handleExportPDF}
                     className="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-[#AA7C11] to-[#D4AF37] text-black font-bold text-xs uppercase tracking-widest hover:brightness-110 transition-all flex items-center justify-center gap-2"
                   >
                     <Download size={15} />
@@ -274,10 +289,16 @@ export default function CatharsisJournal() {
         </AnimatePresence>
       </div>
 
-      {/* Print-only container for PDF export */}
-      <div className="hidden print-show manuscript-print">
-        <h1 className="manuscript-title">{title}</h1>
-        <div>{content}</div>
+      {/* Off-screen container for PDF export */}
+      <div className="absolute top-[-9999px] left-[-9999px] opacity-0 pointer-events-none">
+        <div id="pdf-export-container" style={{ padding: '40px', background: 'white', color: 'black', fontFamily: 'var(--font-tajawal), sans-serif', direction: 'rtl', width: '800px' }}>
+          <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '40px', textAlign: 'center', borderBottom: '2px solid black', paddingBottom: '20px' }}>
+            {title}
+          </h1>
+          <div style={{ fontSize: '18px', lineHeight: '2', whiteSpace: 'pre-wrap' }}>
+            {content}
+          </div>
+        </div>
       </div>
     </>
   );

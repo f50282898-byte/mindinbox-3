@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Tajawal } from "next/font/google";
+import { Reem_Kufi, Tajawal } from "next/font/google";
 import "./globals.css";
-import DynamicIsland from "@/components/DynamicIsland";
+import NavigationDrawer from "@/components/NavigationDrawer";
 import CinematicBackground from "@/components/CinematicBackground";
 import GlobalErrorBoundary from "@/components/GlobalErrorBoundary";
 import { AuthProvider } from "@/context/AuthContext";
 
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
+const reemKufi = Reem_Kufi({
+  subsets: ["arabic", "latin"],
+  variable: "--font-reem-kufi",
   display: "swap",
 });
 
@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className="dark">
       <body
-        className={`${tajawal.variable} ${playfair.variable} font-sans antialiased min-h-screen flex flex-col`}
+        className={`${tajawal.variable} ${reemKufi.variable} font-sans antialiased min-h-screen flex flex-col`}
         style={{ background: "var(--bg-void)", color: "var(--text-primary)" }}
       >
         <GlobalErrorBoundary>
@@ -39,12 +39,12 @@ export default function RootLayout({
             {/* The Global Cinematic Video Engine — sits behind everything */}
             <CinematicBackground />
 
-            {/* Floating navigation pill */}
-            <DynamicIsland />
+            {/* Floating Hamburger Navigation */}
+            <NavigationDrawer />
 
             {/* Page content — sits above the background */}
             <main
-              className="flex-1 relative pt-28 pb-16 px-4 sm:px-8 max-w-7xl mx-auto w-full"
+              className="flex-1 relative w-full h-full flex flex-col"
               style={{ zIndex: 10 }}
             >
               {children}
