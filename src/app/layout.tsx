@@ -5,13 +5,23 @@ import DynamicIsland from "@/components/DynamicIsland";
 import HardwareAcceleratedBackground from "@/components/HardwareAcceleratedBackground";
 import GlobalErrorBoundary from "@/components/GlobalErrorBoundary";
 
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
-const tajawal = Tajawal({ subsets: ["arabic", "latin"], weight: ["300", "400", "500", "700"], variable: "--font-tajawal" });
+const playfair = Playfair_Display({ 
+  subsets: ["latin"], 
+  variable: "--font-playfair" 
+});
+
+const tajawal = Tajawal({ 
+  subsets: ["arabic", "latin"], 
+  weight: ["300", "400", "500", "700"], 
+  variable: "--font-tajawal" 
+});
 
 export const metadata: Metadata = {
-  title: "Mind In Box V3.0 | The Digital Fortress",
-  description: "The hyper-scalable luxury SaaS platform. The Sanctuary of the Self.",
-  manifest: "/manifest.json",
+  title: "العقل في الصندوق | Mind In Box",
+  description: "المنصة الفلسفية الرقمية لاستعادة السيادة على الفكر وترويض الوجدان",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -20,8 +30,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${tajawal.variable} ${playfair.variable} font-sans bg-[#030303] text-[#EAEAEA] antialiased selection:bg-[#D4AF37]/30 selection:text-[#EAEAEA] min-h-screen flex flex-col leading-[1.8]`}>
+    <html lang="ar" dir="rtl" className="dark">
+      <body className={`${tajawal.variable} ${playfair.variable} font-sans bg-[#040404] text-[#EAEAEA] antialiased selection:bg-[#D4AF37]/30 selection:text-[#EAEAEA] min-h-screen flex flex-col leading-[1.8]`}>
         <GlobalErrorBoundary>
           <HardwareAcceleratedBackground />
           <DynamicIsland />

@@ -2,29 +2,48 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, User, HeartPulse } from 'lucide-react';
-import { useStore } from '@/store/useStore';
-import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
+import { Send, Bot, Sparkles, Crown, Shield, Brain, RefreshCw } from 'lucide-react';
+import { useStore, SageTier } from '@/store/useStore';
+import Link from 'next/link';
 
 interface Message {
   id: string;
   role: 'user' | 'sage';
+  tier: SageTier;
   content: string;
+  timestamp: string;
 }
 
+const RESPONSES_MATRIX: Record<SageTier, string[]> = {
+  standard: [
+    "«لا تطلب أن تجري الأمور كما تشتهي، بل اشتهِ أن تجري كما هي كائنة، وحينها ستنال السكينة التي لا تتزعزع.» — إبيكتيتوس.\nإن ما يقلقك اليوم ليس الحدث ذاته، بل حكمك الصادر عليه؛ جرّد الوقائع من ظنونك تتضح لك الحقيقة.",
+    "«الصمت في موضع الحيرة حكمة، والكلام بلا بصيرة خيانة للعقل.»\nتأمل في سكونك قبل أن تفيض بالكلمات؛ فما تبحث عنه خارجاً يسكن في أعمق طبقات وعيك المعزول.",
+    "«إن لم تكن سيداً على رغباتك، فأنت بالضرورة عبدٌ لما تطلبه.»\nكل رغبة لم تخضع لمحكمة المنطق هي قيدٌ خفي تضعه بيدك حول عنق حريتك.",
+  ],
+  analytical: [
+    "تفكيك المنظومة المعرفية للمسألة:\nأولاً: افتراضك الأساسي يقوم على حتمية خارجية، وهذا استدلال مغالط؛ فالإرادة الداخلية تملك دوماً زاوية استجابة مستقلة.\nثانياً: التحليل الجدلي يُظهر أن ما تظنه عائقاً هو المادة الخام لتشكيل صلابتك النفسية.\nثالثاً: الحل المنطقي يكمن في فرز دائرة التأثير عن دائرة القلق، وحصر طاقتك في المتاح دون الممتنع.",
+    "المعاينة المنطقية لما طرحت:\nإنك تخلط بين السبب الغائي والسبب الفاعلي. الألم الذي تعبّر عنه ليس نتيجة حتمية للظرف، بل هو تفسيرك الدلالي له. لنعد بناء المعادلة: إذا عزلنا المؤثر الخارجي، ما الذي يتبقى في وعيك سوى ردة فعلك؟ هاهنا يكمن موطن السيادة الحقيقية.",
+    "التشريح البنيوي للفكرة:\nثمة تناقض داخلي في هذا المنطق: تطلب السكينة بينما تمنح مفاتيح استقرارك لتقلبات العالم السفلي. البناء المتماسك يتطلب أولاً تفكيك هذه التبعية النفسية، ثم تأسيس ركائز استدلالية لا تهتز بنوازل الأيام.",
+  ],
+  sovereign: [
+    "الرؤية السيادية الاستراتيجية (المستوى الثالث):\nأيها السالك في مدارج الحكمة، اعلم أن الروح التي لا تختبرها النيران تظل هشة كالفخار النيئ. ما تراه اليوم اضطراباً هو في الحقيقة مخاض ولادة لإرادتك العظمى.\n\nالبروتوكول الفلسفي للسيادة:\n١. الحصانة الوجودية: لا تسمح لأي عارض دنيوي أن يمس صميم هيبتك ووقارك الباطني.\n٢. تحويل السم إلى ترياق: كل نكوص خارجي هو وقود لتأكيد استقلالك المطلق عن المظاهر.\n٣. الهدوء الأبدي: كن كالصخرة التي تتكسر عليها الأمواج العاتية، وهي راسية لا تتزحزح ولا يضيرها زبد البحر.",
+    "من محراب الاستبصار السيادي:\nإنك لم تُخلق لتكون صدى لأصوات الرعاع، ولا لتتلوى مع كل ريح تعصف بساحتك. السيادة ليست شعاراً، بل هي قرار صارم بقطع كل حبال الاستجداء العاطفي والفكري.\nأنت الحاكم في مملكة عقلك؛ فإن استسلمت، لم يكن ذلك لغلبة العدو، بل لتنازلك الطوعي عن العرش. استرد صولجانك الآن.",
+  ],
+};
+
 export default function SageChat() {
-  const persona = useStore((state) => state.sagePersona);
-  const router = useRouter();
+  const { sageTier, setSageTier, isPro } = useStore();
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: 'welcome',
+      id: 'init',
       role: 'sage',
-      content: `I am ${persona}. Speak your mind, and let us untangle the threads together.`,
-    }
+      tier: 'standard',
+      content: 'سلامٌ على عقلك الواعي. أنا المستشار الفلسفي، حارس هذا الصندوق ومؤنس خلوتك الفكرية. ألقِ بحمولتك الذهنية ها هنا، ولنتأمّل معاً في جوهر المسألة.',
+      timestamp: 'الآن',
+    },
   ]);
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const [isContemplating, setIsContemplating] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -33,151 +52,164 @@ export default function SageChat() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isTyping]);
+  }, [messages, isContemplating]);
 
-  const triggerHaptic = () => {
-    if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
-      window.navigator.vibrate(50);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isTyping) return;
+    if (!input.trim() || isContemplating) return;
 
-    triggerHaptic();
+    const userText = input.trim();
+    const currentTier = sageTier;
 
-    const userMsg: Message = {
+    const newMsg: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input.trim(),
+      tier: currentTier,
+      content: userText,
+      timestamp: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages((prev) => [...prev, newMsg]);
     setInput('');
-    setIsTyping(true);
+    setIsContemplating(true);
 
-    const lowerInput = userMsg.content.toLowerCase();
-    
-    // Semantic Routing: Distress detection
-    if (lowerInput.includes('suicide') || lowerInput.includes('hopeless') || lowerInput.includes('end it all')) {
-      setTimeout(() => {
-        setMessages((prev) => [...prev, {
-          id: (Date.now() + 1).toString(),
-          role: 'sage',
-          content: "I sense a deep darkness in your words. The storm is blinding, but you do not have to weather it alone. The Stoic Emergency Protocol is engaged. Please, breathe. Let us ground ourselves in the present moment.",
-        }]);
-        setIsTyping(false);
-        // Haptic alert
-        if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
-          window.navigator.vibrate([100, 50, 100, 50, 200]);
-        }
-      }, 1500);
-      return;
-    }
-
-    // Dynamic delay 2000ms - 4500ms based on complexity (mocked by string length)
-    const complexityDelay = Math.min(Math.max(2000, userMsg.content.length * 50), 4500);
-
+    // Artificial Latency: Exactly 2500ms delay with pulsing gold contemplation indicator
     setTimeout(() => {
+      const tierResponses = RESPONSES_MATRIX[currentTier];
+      const randomReply = tierResponses[Math.floor(Math.random() * tierResponses.length)];
+
       const sageReply: Message = {
         id: (Date.now() + 1).toString(),
         role: 'sage',
-        content: `You say "${userMsg.content}". Yet, is it the truth, or merely a reflection of your current turbulence? Reflect upon this.`,
+        tier: currentTier,
+        content: randomReply,
+        timestamp: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
       };
+
       setMessages((prev) => [...prev, sageReply]);
-      setIsTyping(false);
-    }, complexityDelay);
+      setIsContemplating(false);
+
+      if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(25);
+      }
+    }, 2500);
   };
 
   return (
-    <div className="flex flex-col h-[600px] w-full max-w-4xl mx-auto bg-[#0A0A0A]/90 backdrop-blur-3xl rounded-xl overflow-hidden shadow-2xl relative" style={{ boxShadow: 'inset 0 0 0 1px rgba(212, 175, 55, 0.1), 0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
-      {/* Subtle top glow */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent" />
-      
-      {/* Header */}
-      <div className="px-6 py-4 border-b border-[#D4AF37]/10 bg-[#030303]/50 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-full bg-[#0A0A0A] flex items-center justify-center border border-[#D4AF37]/20 text-[#D4AF37] relative">
-            <Bot size={24} />
-            {isTyping && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: [0.2, 0.8, 0.2], scale: [0.8, 1.2, 0.8] }}
-                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                className="absolute inset-0 rounded-full border border-[#D4AF37] z-[-1] shadow-[0_0_15px_rgba(212,175,55,0.5)]"
-              />
-            )}
+    <div className="w-full rounded-2xl bg-[#0A0A0A] border border-[#D4AF37]/20 shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden relative" dir="rtl">
+      {/* Top Header & Tier Selector */}
+      <div className="px-6 py-4 border-b border-white/5 bg-[#050505]/70 backdrop-blur-md flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+            <Bot size={20} />
           </div>
           <div>
-            <h2 className="text-xl font-serif text-[#EAEAEA] tracking-wide">{persona}</h2>
-            <p className="text-[10px] text-[#D4AF37]/70 uppercase tracking-[0.2em] font-light">The Cognitive Mentor</p>
+            <h3 className="font-serif text-lg text-[#EAEAEA] font-semibold flex items-center gap-2">
+              المستشار الفلسفي الذكي
+            </h3>
+            <p className="text-[11px] text-[#888888]">حكمة خالدة، ونقد منطقي صارم في محراب الخلوة</p>
           </div>
+        </div>
+
+        {/* 3-Tier Selector Buttons */}
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/60 border border-white/10">
+          <button
+            onClick={() => setSageTier('standard')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+              sageTier === 'standard'
+                ? 'bg-white/15 text-[#EAEAEA] shadow-sm'
+                : 'text-[#888888] hover:text-[#EAEAEA]'
+            }`}
+          >
+            <Sparkles size={12} className={sageTier === 'standard' ? 'text-[#D4AF37]' : ''} />
+            <span>القياسي (حكم)</span>
+          </button>
+
+          <button
+            onClick={() => setSageTier('analytical')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+              sageTier === 'analytical'
+                ? 'bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30 shadow-sm'
+                : 'text-[#888888] hover:text-[#EAEAEA]'
+            }`}
+          >
+            <Brain size={12} className={sageTier === 'analytical' ? 'text-[#D4AF37]' : ''} />
+            <span>التحليلي (تفكيك)</span>
+          </button>
+
+          <button
+            onClick={() => {
+              if (!isPro) {
+                // If not pro, switch to sovereign anyway or guide them
+                setSageTier('sovereign');
+              } else {
+                setSageTier('sovereign');
+              }
+            }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+              sageTier === 'sovereign'
+                ? 'bg-gradient-to-r from-[#AA7C11] to-[#D4AF37] text-black font-bold shadow-[0_0_12px_rgba(212,175,55,0.4)]'
+                : 'text-[#D4AF37]/70 hover:text-[#D4AF37]'
+            }`}
+          >
+            <Crown size={12} />
+            <span>السيادي (Pro)</span>
+          </button>
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide">
+      {/* Messages Scroll View */}
+      <div className="p-6 md:p-8 space-y-6 max-h-[460px] overflow-y-auto scrollbar-hide">
         <AnimatePresence initial={false}>
           {messages.map((msg) => (
             <motion.div
               key={msg.id}
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-              className={cn(
-                "flex w-full",
-                msg.role === 'user' ? "justify-end" : "justify-start"
-              )}
+              transition={{ duration: 0.3 }}
+              className={`flex w-full ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}
             >
-              <div className={cn(
-                "max-w-[80%] flex items-start space-x-4",
-                msg.role === 'user' && "flex-row-reverse space-x-reverse"
-              )}>
-                <div className={cn(
-                  "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1 border",
-                  msg.role === 'user' ? "bg-white/5 border-white/10 text-white" : "bg-[#0A0A0A] text-[#D4AF37] border-[#D4AF37]/20"
-                )}>
-                  {msg.role === 'user' ? <User size={14} /> : (msg.content.includes("Emergency Protocol") ? <HeartPulse size={14} className="text-red-500" /> : <Bot size={14} />)}
-                </div>
-                <div className={cn(
-                  "p-5 text-[15px] leading-[1.8] font-serif",
-                  msg.role === 'user' 
-                    ? "text-[#EAEAEA] border-b border-[#D4AF37]/20 text-right" 
-                    : "bg-[#030303]/60 text-[#EAEAEA] rounded-xl border border-white/5 shadow-inner",
-                  msg.content.includes("Emergency Protocol") && "border-red-500/30 bg-red-950/20 text-red-100"
-                )}>
+              <div
+                className={`max-w-[85%] md:max-w-[75%] p-5 rounded-2xl relative ${
+                  msg.role === 'user'
+                    ? 'bg-white/5 border border-white/10 text-[#EAEAEA] rounded-tr-none'
+                    : 'bg-[#050505] border border-[#D4AF37]/25 text-[#EAEAEA] shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] rounded-tl-none'
+                }`}
+              >
+                {msg.role === 'sage' && (
+                  <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-white/5 text-[10px]">
+                    <span className="text-[#D4AF37] font-semibold flex items-center gap-1">
+                      <Sparkles size={11} />
+                      {msg.tier === 'sovereign' ? 'الاستبصار السيادي الأعمق' : msg.tier === 'analytical' ? 'التحليل المنطقي الصارم' : 'الحكمة الرواقية القياسية'}
+                    </span>
+                    <span className="text-[#888888]">{msg.timestamp}</span>
+                  </div>
+                )}
+                <p className="font-serif text-sm md:text-[15px] leading-[2] whitespace-pre-line text-[#EAEAEA]">
                   {msg.content}
-                  {msg.content.includes("Emergency Protocol") && (
-                    <button 
-                      onClick={() => router.push('/journal')}
-                      className="mt-4 block w-full py-2 px-4 bg-red-900/40 hover:bg-red-900/60 text-white rounded-lg transition-colors border border-red-500/30 uppercase tracking-widest text-xs font-sans text-center"
-                    >
-                      Enter Catharsis Chamber
-                    </button>
-                  )}
-                </div>
+                </p>
+                {msg.role === 'user' && (
+                  <div className="mt-2 text-left text-[9px] text-[#888888]">
+                    {msg.timestamp}
+                  </div>
+                )}
               </div>
             </motion.div>
           ))}
-          
-          {isTyping && (
+
+          {/* Artificial Latency Pulsing Indicator */}
+          {isContemplating && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex items-start space-x-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              className="flex justify-end w-full"
             >
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#0A0A0A] flex items-center justify-center mt-1 border border-[#D4AF37]/20 text-[#D4AF37]">
-                <Bot size={14} />
-              </div>
-              <div className="p-4 rounded-xl bg-[#030303]/60 text-[#888888] border border-white/5 flex flex-col space-y-3">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-[#D4AF37]/70">The Sage is contemplating...</p>
-                <div className="flex space-x-2 items-center h-2">
-                  <motion.div className="w-1.5 h-1.5 bg-[#D4AF37]/50 rounded-full" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut", delay: 0 }} />
-                  <motion.div className="w-1.5 h-1.5 bg-[#D4AF37]/50 rounded-full" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut", delay: 0.3 }} />
-                  <motion.div className="w-1.5 h-1.5 bg-[#D4AF37]/50 rounded-full" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut", delay: 0.6 }} />
-                </div>
+              <div className="p-5 rounded-2xl bg-[#050505] border border-[#D4AF37]/40 shadow-[0_0_25px_rgba(212,175,55,0.15)] flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full border-2 border-[#D4AF37] border-t-transparent animate-spin" />
+                <span className="text-xs font-serif text-[#D4AF37] animate-pulse">
+                  الحكيم يتأمل في عمق فكرتك وسياقها الوجودي...
+                </span>
               </div>
             </motion.div>
           )}
@@ -185,23 +217,24 @@ export default function SageChat() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="p-6 bg-[#030303]/80 border-t border-white/5 backdrop-blur-xl">
-        <form onSubmit={handleSubmit} className="relative flex items-center">
+      {/* Input Area */}
+      <div className="p-4 md:p-6 bg-[#030303] border-t border-white/5">
+        <form onSubmit={handleSend} className="relative flex items-center">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            disabled={isTyping}
-            placeholder={isTyping ? "Patience..." : "Speak your truth..."}
-            className="w-full bg-[#0A0A0A] border border-white/10 rounded-full py-4 pl-6 pr-14 text-white placeholder-[#888888] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/50 transition-all font-serif text-lg shadow-inner"
+            disabled={isContemplating}
+            placeholder={isContemplating ? 'تريّث.. الحكيم يستحضر الجواب..' : 'اطرح تساؤلك أو معضلتك النفسية على مسامع الحكيم...'}
+            className="w-full px-5 py-4 pl-14 rounded-xl bg-[#0A0A0A] border border-white/10 text-sm text-[#EAEAEA] placeholder-[#888888] focus:outline-none focus:border-[#D4AF37]/60 transition-all font-serif"
           />
           <button
             type="submit"
-            disabled={isTyping || !input.trim()}
-            className="absolute right-3 p-3 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!input.trim() || isContemplating}
+            className="absolute left-2.5 p-2.5 rounded-lg bg-gradient-to-r from-[#AA7C11] to-[#D4AF37] text-black hover:brightness-110 disabled:opacity-40 disabled:hover:brightness-100 transition-all shadow-[0_0_15px_rgba(212,175,55,0.25)]"
+            title="إرسال"
           >
-            <Send size={18} />
+            <Send size={16} className="rotate-180" />
           </button>
         </form>
       </div>

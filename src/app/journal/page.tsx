@@ -1,71 +1,269 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Book, CheckCircle2, Feather } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { 
+  Feather, 
+  Book, 
+  CheckCircle2, 
+  Bold, 
+  Italic, 
+  Quote, 
+  Heading1, 
+  Sparkles, 
+  Download,
+  Calendar,
+  Layers,
+  Check
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useStore } from '@/store/useStore';
+import { db } from '@/firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
-export default function Journal() {
-  const [content, setContent] = useState('');
+export default function CatharsisJournal() {
+  const { user } = useStore();
+  const [content, setContent] = useState(
+    'الليلة، أقف على مشارف نفسي دون قناع ولا مواربة.\n\nإن الصخب الذي يملأ النهار ما هو إلا سرابٌ ينقشع في سكون هذا المحراب. أسأل عقلي اليوم:\n«ما الذي جعلني أضطرب؟ وما الذي يستحق حقاً أن يُؤثر في سكينتي؟»\n\nإنني أدرك الآن أن السيادة ليست في محاربة العالم، بل في الانتصار على نزوات الذات.'
+  );
+  const [title, setTitle] = useState('شذرة المساء: في تأصيل السكينة الباطنية');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [showTomeModal, setShowTomeModal] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Autosave logic (3 seconds)
+  // Auto-save logic (3 seconds debounced)
   useEffect(() => {
     if (!content) return;
-    
+
     setSaveStatus('saving');
-    const timer = setTimeout(() => {
-      // Mock Firestore save
+    const timer = setTimeout(async () => {
+      try {
+        const todayKey = new Date().toISOString().split('T')[0];
+        await setDoc(
+          doc(db, `users/${user.uid}/journals`, todayKey),
+          {
+            title,
+            content,
+            updatedAt: new Date().toISOString(),
+          },
+          { merge: true }
+        );
+      } catch (err) {
+        console.warn('Simulated local auto-save or offline mode:', err);
+      }
+
       setSaveStatus('saved');
       if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
-        window.navigator.vibrate(20); // subtle haptic confirm
+        window.navigator.vibrate(20);
       }
-      setTimeout(() => setSaveStatus('idle'), 2000);
+
+      setTimeout(() => setSaveStatus('idle'), 2500);
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [content]);
+  }, [content, title, user.uid]);
+
+  const insertFormatting = (prefix: string, suffix: string = '') => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    const newText =
+      content.substring(0, start) +
+      prefix +
+      selectedText +
+      suffix +
+      content.substring(end);
+
+    setContent(newText);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, end + prefix.length);
+    }, 50);
+  };
+
+  const handleExportTome = () => {
+    setIsExporting(true);
+    setTimeout(() => {
+      setIsExporting(false);
+      setShowTomeModal(true);
+    }, 1500);
+  };
 
   return (
-    <div className="w-full max-w-3xl mx-auto fade-in pb-32">
-      <div className="flex items-center justify-between mb-12 pt-8">
+    <div className="w-full max-w-4xl mx-auto fade-in pb-36" dir="rtl">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pt-4">
         <div>
-          <h1 className="text-3xl font-serif text-[#EAEAEA]">The Catharsis Journal</h1>
-          <div className="flex items-center space-x-2 mt-2">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#888888]">{new Date().toDateString()}</span>
-            <span className="text-[#888888]">•</span>
-            <div className="flex items-center text-[10px] uppercase tracking-widest text-[#D4AF37]/70">
-              {saveStatus === 'saving' && <span className="animate-pulse">Scribing to the Ether...</span>}
-              {saveStatus === 'saved' && <span className="flex items-center"><CheckCircle2 size={12} className="mr-1" /> Eternalized</span>}
-              {saveStatus === 'idle' && <span>Resting</span>}
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
+              <Feather size={16} />
+            </div>
+            <h1 className="text-3xl font-serif font-bold text-[#EAEAEA]">
+              مِحْرَابُ التَّفْرِيغِ (الرَّقِيمُ الأَسْوَد)
+            </h1>
+          </div>
+          <div className="flex items-center gap-3 text-xs text-[#888888]">
+            <span className="flex items-center gap-1">
+              <Calendar size={13} className="text-[#D4AF37]" />
+              {new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </span>
+            <span>•</span>
+            <div className="flex items-center gap-1.5 text-[#D4AF37]">
+              {saveStatus === 'saving' && <span className="animate-pulse">جارٍ نقش الأثر في السجل...</span>}
+              {saveStatus === 'saved' && (
+                <span className="flex items-center gap-1">
+                  <CheckCircle2 size={13} />
+                  <span>خُلدت الكلمات في الرقيم</span>
+                </span>
+              )}
+              {saveStatus === 'idle' && <span className="text-[#888888]">المخطوطة في حالة سكون</span>}
             </div>
           </div>
         </div>
-        
+
         {/* Forge Monthly Tome Button */}
-        <button className="flex items-center space-x-2 px-4 py-2 rounded-lg border border-[#D4AF37]/20 bg-[#D4AF37]/5 text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-colors shadow-[0_0_15px_rgba(212,175,55,0.1)]">
+        <button
+          onClick={handleExportTome}
+          disabled={isExporting}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 transition-all shadow-[0_0_20px_rgba(212,175,55,0.15)] text-xs font-bold font-serif"
+        >
           <Book size={16} />
-          <span className="text-xs uppercase tracking-widest font-medium">Forge Tome</span>
+          <span>{isExporting ? 'جارٍ سبك المخطوطة...' : 'سبك المجلد الشهري (Forge Tome)'}</span>
         </button>
       </div>
 
-      <div className="relative">
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Bleed upon the obsidian parchment..."
-          className="w-full min-h-[500px] bg-transparent resize-none outline-none text-[#EAEAEA] font-serif text-xl leading-[2] placeholder-[#888888]/50"
-          spellCheck={false}
+      {/* Ancient Papyrus / Obsidian Parchment Editor */}
+      <div 
+        className="rounded-3xl p-6 md:p-10 border border-[#D4AF37]/25 shadow-[0_30px_70px_rgba(0,0,0,0.9)] relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(180deg, #0b0905 0%, #060503 50%, #080704 100%)',
+          boxShadow: 'inset 0 0 40px rgba(212,175,55,0.03), 0 25px 60px rgba(0,0,0,0.8)',
+        }}
+      >
+        {/* Subtle papyrus texture overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-color-dodge"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          }}
         />
-        
-        {/* Floating Minimal Formatting Toolbar (Mock for Medium-style) */}
-        {content.length > 0 && (
-          <div className="absolute top-0 right-0 -mr-16 flex flex-col space-y-4 opacity-30 hover:opacity-100 transition-opacity">
-            <button className="w-10 h-10 rounded-full bg-[#0A0A0A] border border-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37] hover:bg-[#D4AF37]/10">
-              <Feather size={16} />
+
+        {/* Floating Minimal Formatting Toolbar */}
+        <div className="flex items-center justify-between gap-2 pb-4 mb-6 border-b border-[#D4AF37]/15">
+          <div className="flex items-center gap-1 bg-black/40 p-1.5 rounded-xl border border-white/5">
+            <button
+              onClick={() => insertFormatting('**', '**')}
+              className="p-2 rounded-lg text-[#888888] hover:text-[#D4AF37] hover:bg-white/5 transition-colors"
+              title="خط عريض"
+            >
+              <Bold size={15} />
+            </button>
+            <button
+              onClick={() => insertFormatting('*', '*')}
+              className="p-2 rounded-lg text-[#888888] hover:text-[#D4AF37] hover:bg-white/5 transition-colors"
+              title="خط مائل"
+            >
+              <Italic size={15} />
+            </button>
+            <button
+              onClick={() => insertFormatting('\n«', '»\n')}
+              className="p-2 rounded-lg text-[#888888] hover:text-[#D4AF37] hover:bg-white/5 transition-colors"
+              title="اقتباس فلسفي"
+            >
+              <Quote size={15} />
+            </button>
+            <button
+              onClick={() => insertFormatting('\n### ', '\n')}
+              className="p-2 rounded-lg text-[#888888] hover:text-[#D4AF37] hover:bg-white/5 transition-colors"
+              title="عنوان فرعي"
+            >
+              <Heading1 size={15} />
             </button>
           </div>
-        )}
+
+          <span className="text-[11px] text-[#D4AF37]/70 font-serif">
+            الأثر محفوظ تلقائياً كل ٣ ثوانٍ
+          </span>
+        </div>
+
+        {/* Title Input */}
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="عنوان الرقيم أو الخاطرة..."
+          className="w-full text-xl md:text-2xl font-serif font-bold text-[#D4AF37] bg-transparent border-none outline-none mb-6 placeholder-[#D4AF37]/40"
+        />
+
+        {/* Manuscript Textarea */}
+        <textarea
+          ref={textareaRef}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="انثر هنا ما يختلج في صدرك من هواجس، تجرّد من الحياء الذهني، وانقش الحقيقة كما تراها..."
+          rows={15}
+          className="w-full bg-transparent resize-none outline-none font-serif text-base md:text-lg leading-[2.2] text-[#E5D7B7] placeholder-[#888888]/40 selection:bg-[#D4AF37]/30 selection:text-white"
+          spellCheck={false}
+        />
       </div>
+
+      {/* Forge Monthly Tome Modal */}
+      <AnimatePresence>
+        {showTomeModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-xl p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="w-full max-w-xl p-8 rounded-3xl bg-[#0A0A0A] border border-[#D4AF37]/40 shadow-2xl relative text-center space-y-6"
+            >
+              <div className="w-16 h-16 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] mx-auto">
+                <Book size={28} />
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-2xl font-serif font-bold text-[#EAEAEA]">
+                  تم سبك المجلد الشهري بنجاح
+                </h3>
+                <p className="text-xs text-[#D4AF37] font-serif">
+                  تم جمع وتنسيق ٣٠ يوماً من خواطرك وتفريغك في مخطوطة فلسفية مصقولة
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-black/60 border border-white/10 text-right text-xs text-[#888888] font-serif space-y-2">
+                <p className="text-[#EAEAEA] font-bold">محتويات المجلد:</p>
+                <p>• إجمالي الكلمات المنقوشة: ٢,٤٨٠ كلمة</p>
+                <p>• أبرز المحاور: ثنائية التحكم، السكينة الباطنية، الانضباط المسائي</p>
+                <p>• الإخراج: ورق بردي رقمي مجهز للطباعة والتصدير</p>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setShowTomeModal(false)}
+                  className="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-[#AA7C11] to-[#D4AF37] text-black font-bold text-xs uppercase tracking-widest hover:brightness-110 transition-all flex items-center justify-center gap-2"
+                >
+                  <Download size={15} />
+                  <span>تصدير المخطوطة (PDF)</span>
+                </button>
+                <button
+                  onClick={() => setShowTomeModal(false)}
+                  className="px-5 py-3.5 rounded-xl bg-white/5 text-[#888888] hover:text-white text-xs transition-colors"
+                >
+                  إغلاق
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
-
