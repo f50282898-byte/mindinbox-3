@@ -290,37 +290,13 @@ export default function CatharsisJournal() {
 
       {/* Off-screen container for PDF export */}
       <div className="absolute top-[-9999px] left-[-9999px] opacity-0 pointer-events-none">
-        <div 
-          id="pdf-export-container" 
-          style={{ 
-            padding: '20mm', 
-            width: '210mm', 
-            backgroundColor: '#FFFFFF', 
-            color: '#000000', 
-            fontFamily: 'var(--font-tajawal), sans-serif', 
-            direction: 'rtl' 
-          }}
-        >
-          {/* Header */}
-          <div style={{ borderBottom: '2px solid #000000', paddingBottom: '20px', marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            <div>
-              <h1 style={{ fontFamily: 'var(--font-reem-kufi), sans-serif', fontSize: '24pt', fontWeight: 'bold', margin: 0 }}>
-                عقل في صندوق
-              </h1>
-              <p style={{ fontSize: '12pt', color: '#555555', marginTop: '5px' }}>مخطوطة الجرد اليومي</p>
-            </div>
-            <div style={{ fontSize: '12pt', fontWeight: 'bold' }}>
-              {new Date().toLocaleDateString('ar-SA')}
-            </div>
+        <div id="pdf-export-container" style={{ padding: '20mm', width: '210mm', backgroundColor: '#FFFFFF', color: '#000000', direction: 'rtl' }}>
+          <div style={{ borderBottom: '2px solid #D4AF37', paddingBottom: '20px', marginBottom: '30px', display: 'flex', justifyContent: 'space-between' }}>
+            <h1 style={{ fontFamily: 'var(--font-reem-kufi), sans-serif', fontSize: '28pt', fontWeight: 'bold', margin: 0, color: '#000' }}>عقل في صندوق</h1>
+            <span style={{ fontFamily: 'var(--font-tajawal), sans-serif', fontSize: '12pt', color: '#555' }}>مخطوطة الجرد اليومي - {new Date().toLocaleDateString('ar-SA')}</span>
           </div>
-
-          {/* Title */}
-          <h2 style={{ fontSize: '20pt', fontWeight: 'bold', marginBottom: '20px', textAlign: 'center', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
-            {title}
-          </h2>
-
-          {/* Content (Splitting by paragraphs to apply pagination avoidance) */}
-          <div style={{ fontSize: '14pt', lineHeight: '2' }}>
+          <h2 style={{ fontFamily: 'var(--font-tajawal), sans-serif', fontSize: '22pt', fontWeight: 'bold', marginBottom: '20px', textAlign: 'center', pageBreakInside: 'avoid' }}>{title}</h2>
+          <div style={{ fontFamily: 'var(--font-tajawal), sans-serif', fontSize: '14pt', lineHeight: 2 }}>
             {content.split('\n\n').map((paragraph, idx) => (
               <div 
                 key={idx} 

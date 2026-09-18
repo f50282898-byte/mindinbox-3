@@ -5,6 +5,7 @@ import CinematicBackground from "@/components/CinematicBackground";
 import GlobalErrorBoundary from "@/components/GlobalErrorBoundary";
 import { AuthProvider } from "@/context/AuthContext";
 import ClientLayout from "@/components/ClientLayout";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const reemKufi = Reem_Kufi({
   subsets: ["arabic", "latin"],
@@ -31,18 +32,20 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className="dark">
       <body
-        className={`${tajawal.variable} ${reemKufi.variable} font-sans antialiased min-h-screen flex flex-col`}
-        style={{ background: "var(--bg-void)", color: "var(--text-primary)" }}
+        className={`${tajawal.variable} ${reemKufi.variable} antialiased min-h-screen flex flex-col`}
+        style={{ background: "var(--bg-void)", color: "var(--text-primary)", fontFamily: "var(--font-tajawal), sans-serif" }}
       >
-        <GlobalErrorBoundary>
-          <AuthProvider>
-            <CinematicBackground />
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <GlobalErrorBoundary>
+            <AuthProvider>
+              <CinematicBackground />
 
-            <ClientLayout>
-              {children}
-            </ClientLayout>
-          </AuthProvider>
-        </GlobalErrorBoundary>
+              <ClientLayout>
+                {children}
+              </ClientLayout>
+            </AuthProvider>
+          </GlobalErrorBoundary>
+        </ThemeProvider>
       </body>
     </html>
   );

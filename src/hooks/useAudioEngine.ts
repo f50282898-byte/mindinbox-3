@@ -9,18 +9,12 @@ export type PersonaParams = {
   genderPref: 'male' | 'female' | 'any';
 };
 
-const PERSONA_CONFIGS: Record<string, PersonaParams> = {
-  "Avicenna": { name: "Avicenna", pitch: 0.8, rate: 0.9, genderPref: 'male' },
-  "Dostoevsky": { name: "Dostoevsky", pitch: 1.1, rate: 1.0, genderPref: 'male' },
-  "Hypatia": { name: "Hypatia", pitch: 1.0, rate: 0.95, genderPref: 'female' },
-  "Default": { name: "Default", pitch: 1.0, rate: 1.0, genderPref: 'any' }
-};
-
 interface AudioEngineState {
   isRecording: boolean;
   isSpeaking: boolean;
   audioBlob: Blob | null;
   error: string | null;
+  transcription: string | null;
 }
 
 export const useAudioEngine = () => {
@@ -29,28 +23,21 @@ export const useAudioEngine = () => {
     isSpeaking: false,
     audioBlob: null,
     error: null,
+    transcription: null,
   });
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<BlobPart[]>([]);
-  const synthRef = useRef<SpeechSynthesis | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      synthRef.current = window.speechSynthesis;
-      // Trigger voice loading
-      synthRef.current.getVoices();
-    }
-  }, []);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const setError = (error: string) => {
     setState(prev => ({ ...prev, error }));
   };
 
-  // --- Speech-to-Text (Microphone) ---
+  // --- Speech-to-Text (Microphone -> Whisper API) ---
   const startRecording = useCallback(async () => {
     try {
-      setState(prev => ({ ...prev, error: null, audioBlob: null }));
+      setState(prev => ({ ...prev, error: null, audioBlob: null, transcription: null }));
       
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
@@ -64,11 +51,30 @@ export const useAudioEngine = () => {
         }
       };
 
-      mediaRecorder.onstop = () => {
+      mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         setState(prev => ({ ...prev, isRecording: false, audioBlob }));
-        // Stop all tracks to release microphone
         stream.getTracks().forEach(track => track.stop());
+
+        // Process STT immediately
+        try {
+          const formData = new FormData();
+          formData.append('file', new File([audioBlob], 'audio.webm', { type: 'audio/webm' }));
+          
+          const res = await fetch('/api/audio/stt', {
+            method: 'POST',
+            body: formData,
+          });
+          
+          if (res.ok) {
+            const data = await res.json();
+            setState(prev => ({ ...prev, transcription: data.text }));
+          } else {
+            setError('Transcription failed.');
+          }
+        } catch (err) {
+          setError('Failed to reach STT service.');
+        }
       };
 
       mediaRecorder.start();
@@ -89,55 +95,57 @@ export const useAudioEngine = () => {
     }
   }, []);
 
-  // --- Text-to-Speech (Dynamic Voices) ---
-  const speak = useCallback((text: string, personaName: string = "Default") => {
-    if (!synthRef.current) {
-      setError('Text-to-speech is not supported in this browser.');
-      return;
-    }
+  // --- Text-to-Speech (OpenAI TTS API) ---
+  const speak = useCallback(async (text: string, personaName: string = "Default") => {
+    try {
+      // Cancel any ongoing speech
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current.src = '';
+      }
 
-    // Cancel any ongoing speech
-    synthRef.current.cancel();
+      setState(prev => ({ ...prev, isSpeaking: true, error: null }));
 
-    const config = PERSONA_CONFIGS[personaName] || PERSONA_CONFIGS["Default"];
-    const utterance = new SpeechSynthesisUtterance(text);
+      const response = await fetch('/api/audio/tts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text, voiceId: personaName }),
+      });
 
-    utterance.pitch = config.pitch;
-    utterance.rate = config.rate;
+      if (!response.ok) {
+        throw new Error('TTS Failed');
+      }
 
-    // Try to select an appropriate voice
-    const voices = synthRef.current.getVoices();
-    if (voices.length > 0) {
-      // Find voices matching the gender preference if possible
-      // (Note: The Web Speech API doesn't officially expose gender, 
-      // but we can try to guess based on name/URI or just pick a good default)
-      let selectedVoice = voices.find(v => v.lang.startsWith('en')); // default to English
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
       
-      // Basic heuristic for demo purposes
-      if (config.genderPref === 'male') {
-        selectedVoice = voices.find(v => v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('guy') || v.name.toLowerCase().includes('david')) || selectedVoice;
-      } else if (config.genderPref === 'female') {
-        selectedVoice = voices.find(v => v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('girl') || v.name.toLowerCase().includes('zira')) || selectedVoice;
-      }
+      currentAudioRef.current = audio;
 
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-      }
-    }
+      audio.onended = () => {
+        setState(prev => ({ ...prev, isSpeaking: false }));
+        URL.revokeObjectURL(audioUrl);
+      };
 
-    utterance.onstart = () => setState(prev => ({ ...prev, isSpeaking: true }));
-    utterance.onend = () => setState(prev => ({ ...prev, isSpeaking: false }));
-    utterance.onerror = (e) => {
-      console.error('Speech synthesis error:', e);
+      audio.onerror = () => {
+        setError('Error playing audio.');
+        setState(prev => ({ ...prev, isSpeaking: false }));
+      };
+
+      await audio.play();
+    } catch (err) {
+      console.error('TTS execution error:', err);
+      setError('Could not generate or play audio.');
       setState(prev => ({ ...prev, isSpeaking: false }));
-    };
-
-    synthRef.current.speak(utterance);
+    }
   }, []);
 
   const stopSpeaking = useCallback(() => {
-    if (synthRef.current) {
-      synthRef.current.cancel();
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current.src = '';
       setState(prev => ({ ...prev, isSpeaking: false }));
     }
   }, []);

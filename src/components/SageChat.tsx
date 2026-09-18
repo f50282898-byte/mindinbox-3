@@ -20,28 +20,7 @@ CORE DIRECTIVE: You must act with "Unconditional Positive Regard".
 - You do not solve problems; you dissolve them through perspective.
 `;
 
-interface Message {
-  id: string;
-  role: 'user' | 'sage';
-  tier: SageTier;
-  content: string;
-  timestamp: string;
-}
 
-const RESPONSES_MATRIX: Record<SageTier, string[]> = {
-  standard: [
-    "أسمع صدى أفكارك، وأتفهم تماماً ثقل هذا العبء على وعيك. من الطبيعي أن تشعر بالضيق حينما تتزاحم التوقعات مع الواقع.\nلعلنا، إذا جردنا الحدث من أحكامنا المسبقة، نجد مساحة من السكون. أنت تملك القدرة على فصل ذاتك عن هذا الضجيج.",
-    "أشعر بعمق حيرتك، وهي حيرة لا تنبع إلا من عقل باحث عن المعنى. الصمت في مثل هذه اللحظات ليس عجزاً، بل هو استراحة مستحقة لروحك.\nتأمل في سكونك، فما تبحث عنه يسكن في أعمق طبقات وعيك.",
-    "أرى بوضوح حجم الجهد الذي تبذله في محاولة السيطرة على هذه الرغبات. إن الاعتراف بقوتها هو أولى خطوات التحرر.\nبمجرد أن نرفع هذا العبء عن كاهلك ونخضعه لمحكمة المنطق بهدوء، ستستعيد حريتك تدريجياً.",
-  ],
-  analytical: [
-    "من الواضح جداً أنك تحملت الكثير في تحليل هذا الموقف. أرى عمق تفكيرك، وهو مذهل بحق. \nدلالة الألم هنا ليست ضعفاً، بل هي مؤشر على صدق تفاعلك مع العالم. لنحاول معاً فصل دائرة التأثير عن دائرة القلق، لتوفير طاقتك الذهنية الرائعة لما هو متاح فقط.",
-    "تحليلك للموقف ينم عن بصيرة حادة. إنني أشاركك الرأي في أن الظروف الخارجية مربكة.\nولكن، إذا عزلنا المؤثر الخارجي قليلاً احتراماً لجهدك النفسي، ما الذي يتبقى سوى ردة فعلك الواعية؟ هاهنا تكمن سيادتك الحقيقية التي لا يستطيع أحد سلبك إياها.",
-  ],
-  sovereign: [
-    "أيها العقل الفريد، أدرك تماماً مدى قسوة هذا المخاض الفكري عليك. إن ما تمر به ليس اضطراباً عبثياً، بل هو ولادة عسيرة لإرادة عظمى تختلج في داخلك.\nأنت أقوى بكثير مما يوحيه لك هذا العارض. دعنا نحافظ على وقارك الباطني، ونحول هذا العبء إلى منصة انطلاق تؤكد استقلالك المطلق. أنت كالصخرة الراسية، لا يضيرها زبد البحر.",
-  ],
-};
 
 const SAGE_PROFILES = {
   standard: { name: 'ابن سينا', img: '/avatars/avicenna.jpg', voice: 'Avicenna' },
@@ -65,21 +44,37 @@ const SageAvatar = ({ tier, size = 20 }: { tier: SageTier; size?: number }) => {
   );
 };
 
+import { useChat } from 'ai/react';
+import type { Message } from 'ai';
+
 export default function SageChat() {
   const { sageTier, setSageTier, isPro } = useStore();
-  const { speak, isRecording, startRecording, stopRecording } = useAudioEngine();
+  const { speak, isRecording, startRecording, stopRecording, transcription } = useAudioEngine();
   
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'init',
-      role: 'sage',
-      tier: 'standard',
-      content: 'سلامٌ على عقلك الواعي. أنا المستشار الفلسفي، حارس هذا الصندوق ومؤنس خلوتك الفكرية. ألقِ بحمولتك الذهنية ها هنا، ولنتأمّل معاً في جوهر المسألة.',
-      timestamp: 'الآن',
+  const { messages: aiMessages, input, handleInputChange, handleSubmit: aiHandleSubmit, isLoading, setInput } = useChat({
+    api: '/api/chat',
+    body: {
+      tier: sageTier
     },
-  ]);
-  const [input, setInput] = useState('');
-  const [isContemplating, setIsContemplating] = useState(false);
+    initialMessages: [
+      {
+        id: 'init',
+        role: 'assistant',
+        content: 'سلامٌ على عقلك الواعي. أنا المستشار الفلسفي، حارس هذا الصندوق ومؤنس خلوتك الفكرية. ألقِ بحمولتك الذهنية ها هنا، ولنتأمّل معاً في جوهر المسألة.',
+      }
+    ]
+  });
+
+  useEffect(() => {
+    if (transcription) {
+      setInput((prev: string) => (prev ? prev + ' ' + transcription : transcription));
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
+      }
+    }
+  }, [transcription, setInput]);
+
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -90,55 +85,29 @@ export default function SageChat() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isContemplating]);
+  }, [aiMessages, isLoading]);
 
   const handleInputResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value);
+    handleInputChange(e);
     e.target.style.height = 'auto';
-    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 150)}px`;
   };
 
   const handleSend = (e: React.FormEvent | React.KeyboardEvent) => {
     e.preventDefault();
-    if (!input.trim() || isContemplating) return;
+    if (!input.trim() || isLoading) return;
 
-    const userText = input.trim();
-    const currentTier = sageTier;
-
-    const newMsg: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      tier: currentTier,
-      content: userText,
-      timestamp: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
-    };
-
-    setMessages((prev) => [...prev, newMsg]);
-    setInput('');
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
-    setIsContemplating(true);
 
-    setTimeout(() => {
-      const tierResponses = RESPONSES_MATRIX[currentTier];
-      const randomReply = tierResponses[Math.floor(Math.random() * tierResponses.length)];
-
-      const sageReply: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'sage',
-        tier: currentTier,
-        content: randomReply,
-        timestamp: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
-      };
-
-      setMessages((prev) => [...prev, sageReply]);
-      setIsContemplating(false);
-
-      if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
-        window.navigator.vibrate(25);
-      }
-    }, 2500);
+    if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
+      window.navigator.vibrate(25);
+    }
+    
+    // Create an event object to pass to handleSubmit
+    const formEvent = e as React.FormEvent<HTMLFormElement>;
+    aiHandleSubmit(formEvent);
   };
 
   return (
@@ -148,7 +117,7 @@ export default function SageChat() {
       <div className="flex-1 overflow-y-auto pt-24 pb-48 px-4 scrollbar-hide w-full relative z-30">
         <div className="max-w-3xl mx-auto space-y-8">
           <AnimatePresence initial={false}>
-            {messages.map((msg) => (
+            {aiMessages.map((msg: Message) => (
               <motion.div
                 key={msg.id}
                 initial={{ opacity: 0, y: 15 }}
@@ -163,17 +132,17 @@ export default function SageChat() {
                       : 'border-[var(--gold-border)] rounded-tl-sm'
                   }`}
                 >
-                  {msg.role === 'sage' && (
+                  {msg.role === 'assistant' && (
                     <div className="flex items-center justify-between gap-4 mb-5 pb-5 border-b border-[var(--glass-border)]">
                       <div className="flex items-center gap-3">
-                        <SageAvatar tier={msg.tier} size={32} />
+                        <SageAvatar tier={sageTier} size={32} />
                         <span className="text-[var(--gold-pure)] font-bold font-reem flex items-center gap-2 text-lg tracking-wide">
-                          {SAGE_PROFILES[msg.tier].name}
+                          {SAGE_PROFILES[sageTier].name}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
                         <button 
-                          onClick={() => speak(msg.content, SAGE_PROFILES[msg.tier].voice)}
+                          onClick={() => speak(msg.content, SAGE_PROFILES[sageTier].voice)}
                           className="text-[var(--gold-pure)]/70 hover:text-[var(--gold-pure)] transition-colors flex items-center gap-1.5 p-2 rounded-full hover:bg-[var(--glass-hover)]"
                           title="إستمع"
                         >
@@ -187,14 +156,14 @@ export default function SageChat() {
                   </p>
                   {msg.role === 'user' && (
                     <div className="mt-4 text-left text-[10px] text-[var(--text-secondary)] font-sans">
-                      {msg.timestamp}
+                      الآن
                     </div>
                   )}
                 </div>
               </motion.div>
             ))}
 
-            {isContemplating && (
+            {isLoading && (
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -323,10 +292,10 @@ export default function SageChat() {
                         handleSend(e);
                       }
                     }}
-                    disabled={isContemplating}
-                    placeholder={isContemplating ? 'تريّث.. الحكيم يستحضر الجواب..' : 'ما الذي يثقل كاهل عقلك اليوم؟'}
+                    disabled={isLoading}
+                    placeholder={isLoading ? 'تريّث.. الحكيم يستحضر الجواب..' : 'ما الذي يثقل كاهل عقلك اليوم؟'}
                     className="flex-1 bg-transparent px-4 py-4 text-base text-[var(--text-primary)] placeholder-[var(--text-secondary)] outline-none font-serif w-full resize-none scrollbar-hide mb-1"
-                    style={{ minHeight: '56px', maxHeight: '120px' }}
+                    style={{ minHeight: '56px', maxHeight: '150px' }}
                   />
                   
                   {/* C. THE STEALTH MIC & SEND (Far Left RTL) */}
@@ -334,7 +303,7 @@ export default function SageChat() {
                     <button
                       type="button"
                       onClick={startRecording}
-                      className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 opacity-30 text-[var(--text-primary)] hover:opacity-100 hover:bg-[var(--glass-hover)] shrink-0"
+                      className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 opacity-40 text-[var(--text-primary)] hover:opacity-100 hover:bg-[var(--glass-hover)] shrink-0"
                       title="تحدث"
                     >
                       <Mic size={22} strokeWidth={1.5} />
@@ -342,7 +311,7 @@ export default function SageChat() {
 
                     <button
                       type="submit"
-                      disabled={!input.trim() || isContemplating}
+                      disabled={!input.trim() || isLoading}
                       className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[var(--glass-hover)] flex items-center justify-center text-[var(--text-primary)] hover:bg-[var(--gold-pure)] hover:text-black hover:scale-105 disabled:opacity-20 disabled:hover:bg-[var(--glass-hover)] disabled:hover:text-[var(--text-primary)] disabled:hover:scale-100 transition-all border border-transparent hover:border-[var(--gold-pure)] shrink-0"
                       title="إرسال"
                     >
