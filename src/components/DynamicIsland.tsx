@@ -150,28 +150,27 @@ export default function DynamicIsland() {
     <>
       <header
         dir="rtl"
-        className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none"
+        className="fixed top-4 inset-x-0 z-50 flex justify-center px-1.5 sm:px-3 md:px-4 pointer-events-none"
       >
-        <div ref={islandRef} className="relative pointer-events-auto w-full max-w-4xl">
+        <div ref={islandRef} className="relative pointer-events-auto w-full max-w-[min(100%,58rem)]">
 
           {/* ════════ THE PILL ════════ */}
           <motion.nav
             initial={{ y: -40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="glass-gold flex items-center justify-between gap-2 md:gap-4 px-3 md:px-5 py-2 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(212,175,55,0.15)]"
+            className="glass-gold flex w-full items-center justify-between gap-1 sm:gap-1.5 md:gap-3 px-1.5 sm:px-2.5 md:px-4 py-1 sm:py-1.5 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(212,175,55,0.15)] overflow-hidden"
           >
-
             {/* ── Logo ── */}
-            <Link href="/" className="flex items-center gap-2 group shrink-0">
-              <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-[#AA7C11]/30 to-black border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37] group-hover:scale-110 transition-transform duration-300">
-                <Sparkles size={16} />
+            <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group shrink-0 min-w-0">
+              <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#AA7C11]/30 to-black border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37] group-hover:scale-110 transition-transform duration-300">
+                <Sparkles size={14} className="sm:w-4 sm:h-4" />
                 {/* Ambient pulse ring */}
                 <span className="absolute inset-0 rounded-full border border-[#D4AF37]/30 animate-ping opacity-40" />
               </div>
               <div className="hidden sm:block">
                 <div className="flex items-center gap-2">
-                  <p className="font-serif text-xs font-bold tracking-widest text-[var(--text-primary)] group-hover:text-[var(--gold-pure)] transition-colors leading-none">
+                  <p className="font-serif text-[10px] sm:text-xs font-bold tracking-widest text-[var(--text-primary)] group-hover:text-[var(--gold-pure)] transition-colors leading-none">
                     MIND IN BOX
                   </p>
                   {/* Listening Pulse Indicator */}
@@ -180,14 +179,14 @@ export default function DynamicIsland() {
                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[var(--gold-muted)]"></span>
                   </span>
                 </div>
-                <p className="text-[8px] text-[var(--gold-muted)] tracking-widest uppercase leading-none mt-1">
+                <p className="text-[7px] sm:text-[8px] text-[var(--gold-muted)] tracking-widest uppercase leading-none mt-1">
                   {currentUser ? 'المراقب الكوني' : 'العقل في الصندوق'}
                 </p>
               </div>
             </Link>
 
             {/* ── Center Nav ── */}
-            <div className="flex items-center gap-0.5 sm:gap-1">
+            <div className="flex flex-1 min-w-0 items-center justify-center gap-0.5 sm:gap-1 overflow-hidden">
               {NAV_LINKS.map((item) => {
                 const isActive = pathname === item.href;
                 const isLocked = item.proOnly && !isPro;
@@ -200,7 +199,7 @@ export default function DynamicIsland() {
                       e.preventDefault();
                       togglePanel('fomo');
                     } : undefined}
-                    className={`relative group px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                    className={`relative group shrink-0 px-1.5 sm:px-2 md:px-2.5 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-medium transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5 ${
                       isActive
                         ? 'text-[var(--gold-pure)] bg-[var(--gold-glow)] border border-[var(--gold-border)]'
                         : isLocked
@@ -208,13 +207,12 @@ export default function DynamicIsland() {
                           : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'
                     }`}
                   >
-                    <Icon size={13} />
-                    <span className="hidden md:inline">{item.label}</span>
-
+                    <Icon size={12} className="sm:w-[13px] sm:h-[13px]" />
+                    <span className="hidden sm:inline">{item.label}</span>
                     {/* Lock badge for Pro-only items */}
                     {isLocked && (
                       <span className="relative flex">
-                        <Lock size={9} className="text-[var(--gold-muted)]" />
+                        <Lock size={8} className="sm:w-[9px] sm:h-[9px] text-[var(--gold-muted)]" />
                         <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-[var(--gold-pure)] pulse-gold" />
                       </span>
                     )}
@@ -231,17 +229,17 @@ export default function DynamicIsland() {
 
               {/* ── Pro badge / Upgrade CTA ── */}
               {isPro ? (
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[var(--gold-glow)] text-[var(--gold-pure)] border border-[var(--gold-border)] flex items-center gap-1 shrink-0">
+                <span className="hidden sm:flex px-2.5 py-1 rounded-full text-[10px] font-bold bg-[var(--gold-glow)] text-[var(--gold-pure)] border border-[var(--gold-border)] items-center gap-1 shrink-0">
                   <Crown size={11} />
-                  <span className="hidden sm:inline">العهد السيادي</span>
+                  <span className="hidden md:inline">العهد السيادي</span>
                 </span>
               ) : (
                 <button
                   onClick={() => router.push('/vault/checkout')}
-                  className="relative px-3 py-1.5 rounded-full text-[10px] font-bold gold-gradient text-black flex items-center gap-1 hover:brightness-110 transition-all shrink-0 shadow-[0_0_12px_rgba(212,175,55,0.3)]"
+                  className="relative px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-bold gold-gradient text-black flex items-center gap-1 hover:brightness-110 transition-all shrink-0 shadow-[0_0_12px_rgba(212,175,55,0.3)]"
                 >
-                  <Crown size={12} />
-                  <span>ترقية</span>
+                  <Crown size={11} className="sm:w-3.5 sm:h-3.5" />
+                  <span className="hidden sm:inline">ترقية</span>
                   {/* Locked features count badge */}
                   {lockedCount > 0 && (
                     <span className="absolute -top-1.5 -left-1.5 w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-black flex items-center justify-center border border-black">
@@ -253,35 +251,35 @@ export default function DynamicIsland() {
             </div>
 
             {/* ── Right: Avatar / Auth ── */}
-            <div className="shrink-0 flex items-center gap-2">
+            <div className="shrink-0 flex items-center gap-1 sm:gap-2">
               <button
                 onClick={() => setIsSettingsOpen(true)}
-                className="p-2 rounded-full text-[var(--text-muted)] hover:text-[var(--gold-pure)] hover:bg-white/5 transition-colors"
+                className="p-1.5 sm:p-2 rounded-full text-[var(--text-muted)] hover:text-[var(--gold-pure)] hover:bg-white/5 transition-colors"
               >
-                <Settings size={16} />
+                <Settings size={14} className="sm:w-4 sm:h-4" />
               </button>
 
               {!currentUser ? (
                 <Link
                   href="/auth"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-[var(--gold-border)] transition-all text-[var(--text-secondary)] text-xs hover:text-[var(--text-primary)]"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 rounded-full bg-white/5 border border-white/10 hover:border-[var(--gold-border)] transition-all text-[var(--text-secondary)] text-[10px] sm:text-xs hover:text-[var(--text-primary)]"
                 >
-                  <User size={13} className="text-[var(--gold-muted)]" />
+                  <User size={12} className="sm:w-[13px] sm:h-[13px] text-[var(--gold-muted)]" />
                   <span className="hidden sm:inline font-serif">ولوج</span>
                 </Link>
               ) : (
                 <button
                   onClick={() => togglePanel('profile')}
-                  className={`flex items-center gap-1.5 p-1.5 rounded-full transition-all border ${
+                  className={`flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 rounded-full transition-all border ${
                     panel === 'profile'
                       ? 'bg-[var(--gold-glow)] border-[var(--gold-border)]'
                       : 'bg-white/5 border-white/10 hover:border-[var(--gold-border)]'
                   }`}
                 >
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[var(--gold-dim)] to-black flex items-center justify-center border border-[var(--gold-border)] text-[var(--gold-pure)]">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-[var(--gold-dim)] to-black flex items-center justify-center border border-[var(--gold-border)] text-[var(--gold-pure)] overflow-hidden">
                     {currentUser.photoURL
                       ? <img src={currentUser.photoURL} alt="" className="w-full h-full rounded-full object-cover" />
-                      : <User size={12} />
+                      : <User size={12} className="sm:w-[13px] sm:h-[13px]" />
                     }
                   </div>
                   <ChevronDown
