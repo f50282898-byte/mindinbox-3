@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useStore } from '@/store/useStore';
-import { Feather, Flame, BrainCircuit, Castle } from 'lucide-react';
+import { Feather, Flame, BrainCircuit, Castle, Landmark } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -13,6 +13,7 @@ export default function Sidebar() {
   const navItems = [
     { name: 'اسأل الحكيم', path: '/', icon: BrainCircuit },
     { name: 'يوتوبيا', path: '/utopian-city', icon: Castle },
+    { name: 'أروقة المدرسة', path: '/school', icon: Landmark },
     { name: 'المجلس السري', path: '/secret-council', icon: Flame },
     { name: 'محراب التفريغ', path: '/journal', icon: Feather },
   ];

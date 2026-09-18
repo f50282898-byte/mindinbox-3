@@ -19,6 +19,7 @@ import {
 import Link from 'next/link';
 import { useStore } from '@/store/useStore';
 import { db } from '@/firebase';
+import FaradayOverlay from '@/components/FaradayOverlay';
 import { 
   collection, 
   addDoc, 
@@ -187,7 +188,8 @@ export default function SecretCouncil() {
   // If Not Pro: Render Majestic Golden Locked Gate
   if (!isPro) {
     return (
-      <div className="w-full min-h-[70vh] flex items-center justify-center fade-in px-4" dir="rtl">
+      <FaradayOverlay>
+        <div className="w-full min-h-[70vh] flex items-center justify-center fade-in px-4" dir="rtl">
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -224,11 +226,13 @@ export default function SecretCouncil() {
           </div>
         </motion.div>
       </div>
+      </FaradayOverlay>
     );
   }
 
   // If Pro: Render Real-time Encrypted Chat
   return (
+    <FaradayOverlay>
     <div className="w-full fade-in pb-32 max-w-4xl mx-auto" dir="rtl">
       {/* Header */}
       <div className="flex items-center justify-between p-6 rounded-2xl bg-[#0A0A0A] border border-[#D4AF37]/20 shadow-xl mb-6">
@@ -340,6 +344,7 @@ export default function SecretCouncil() {
         </div>
       </div>
     </div>
+    </FaradayOverlay>
   );
 }
 

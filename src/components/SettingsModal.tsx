@@ -18,6 +18,7 @@ export default function SettingsModal({ isOpen, onClose }: { isOpen: boolean; on
   const [displayName, setDisplayName] = useState(currentUser?.displayName || user.displayName || '');
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
+  const [cancelFlowState, setCancelFlowState] = useState<'none' | 'confirm' | 'frozen' | 'cancelled'>('none');
 
   useEffect(() => {
     setDisplayName(currentUser?.displayName || user.displayName || '');
@@ -197,6 +198,58 @@ export default function SettingsModal({ isOpen, onClose }: { isOpen: boolean; on
                     <AlertCircle size={16} strokeWidth={1.5} />
                     <span className="font-serif text-xs">حذف الحساب نهائياً</span>
                   </button>
+                )}
+
+                {/* Subscription Freezing (Pro only) */}
+                {isPro && (
+                  <div className="pt-4 border-t border-white/5">
+                    {cancelFlowState === 'none' && (
+                      <button
+                        onClick={() => setCancelFlowState('confirm')}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl hover:bg-[#D4AF37]/10 text-sm text-[#D4AF37] transition-all border border-[#D4AF37]/20"
+                      >
+                        <span className="font-serif text-xs">إلغاء الاشتراك (Cancel Subscription)</span>
+                      </button>
+                    )}
+
+                    {cancelFlowState === 'confirm' && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+                        className="p-5 rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/5 text-center space-y-4"
+                      >
+                        <p className="text-sm font-serif text-[#EAEAEA] leading-relaxed">
+                          عقول النخبة تحتاج إلى راحة أحياناً. بدلاً من هدم خزانة أفكارك، جمد اشتراكك مجاناً وسنحرسها لك حتى تعود.
+                        </p>
+                        <div className="flex flex-col gap-2">
+                          <button 
+                            onClick={() => setCancelFlowState('frozen')}
+                            className="w-full py-2.5 text-xs font-bold bg-[#D4AF37] text-black rounded-lg hover:brightness-110 transition-all"
+                            style={{ fontFamily: 'var(--font-reem-kufi)' }}
+                          >
+                            تجميد العهد
+                          </button>
+                          <button 
+                            onClick={() => setCancelFlowState('cancelled')}
+                            className="w-full py-2.5 text-xs font-serif text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                          >
+                            إلغاء نهائي
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {cancelFlowState === 'frozen' && (
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4 rounded-xl border border-blue-500/30 bg-blue-500/10 text-center">
+                        <p className="text-xs text-blue-200 font-serif">تم تجميد العهد. خزانة أفكارك في حفظنا حتى عودتك.</p>
+                      </motion.div>
+                    )}
+
+                    {cancelFlowState === 'cancelled' && (
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-center">
+                        <p className="text-xs text-red-200 font-serif">تم الإلغاء. نأسف لفراقك.</p>
+                      </motion.div>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

@@ -38,3 +38,4 @@ export const useAutoGhost = (timeoutSeconds: number = 45) => {
 
   return isGhostMode;
 };
+

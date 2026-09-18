@@ -30,156 +30,108 @@ interface PhilosophicalEntity {
 
 interface PhilosopherRaw {
   author: string;
+  avatar: string;
   school: string;
   schoolKey: 'stoic' | 'islamic' | 'existential' | 'eastern';
   concepts: string[];
   quoteTemplates: string[];
   personaPrompt: string;
   dilemma: string; // shown in Daily Sage hero + read aloud by TTS
+  inquiries: string[];
 }
 
 /* ══════════════════════════════════════════════════════════
    PHILOSOPHERS POOL
 ══════════════════════════════════════════════════════════ */
 const PHILOSOPHERS_POOL: PhilosopherRaw[] = [
-  // Stoicism
   {
     author: 'ماركوس أوريليوس',
+    avatar: '/avatars/marcus.jpg',
     school: 'الرواقية الإمبراطورية',
     schoolKey: 'stoic',
-    concepts: ['قدسية العقل المدبر', 'حتمية الزوال (موريتوري)', 'الانسجام مع الطبيعة الكلية', 'حصار الأحكام الذاتية'],
-    quoteTemplates: [
-      'تخلَّ عن حكمك على الأمور يتلاشى الألم؛ ارفض القول «لقد لُحِق بي الأذى»، وسينعدم الأذى نفسه.',
-      'إن لم يكن الأمر صواباً فلا تفعله، وإن لم يكن حقاً فلا تقله. حصنك الباطني هو ملاذك الوحيد.',
-      'العالم تحوّلٌ مستمر، وحياتنا ما تصنعه أفكارنا ومواقفنا تجاه نوائب الدهر.',
-    ],
-    personaPrompt: 'أنت الإمبراطور الفيلسوف ماركوس أوريليوس. تخاطب السائل بلهجة رواقية حازمة، مهيبة، تذكره بأن لا شيء خارج عقله يملك سلطاناً عليه.',
-    dilemma:
-      'أيها الزائر، قف لحظة وانظر إلى ما يشغل بالك اليوم. هل هو مما تملك تغييره، أم مما رسمه القدر بقلمٍ لا يُمحى؟ الإمبراطور يسألك: أين تضع طاقتك، في ما بيدك، أم في ما أبعد من سلطانك؟ أجب بصدق، فالرواقية لا تقبل التهرب.',
+    concepts: ['قدسية العقل المدبر', 'حتمية الزوال', 'الانسجام مع الطبيعة'],
+    quoteTemplates: ['تخلَّ عن حكمك على الأمور يتلاشى الألم؛ ارفض القول «لقد لُحِق بي الأذى»، وسينعدم الأذى نفسه.'],
+    personaPrompt: 'أنت الإمبراطور الفيلسوف ماركوس أوريليوس.',
+    dilemma: 'أيها الزائر، قف لحظة وانظر إلى ما يشغل بالك اليوم. هل هو مما تملك تغييره، أم مما رسمه القدر بقلمٍ لا يُمحى؟ الإمبراطور يسألك: أين تضع طاقتك، في ما بيدك، أم في ما أبعد من سلطانك؟',
+    inquiries: ['كيف أطبق هذا العزل على قلقي اليوم؟', 'هل الخضوع للقدر يعني الاستسلام التام؟', 'كيف أتحكم في ردود أفعالي الغاضبة؟']
   },
   {
     author: 'سينيكا',
+    avatar: '/avatars/seneca.jpg',
     school: 'الرواقية الرومانية',
     schoolKey: 'stoic',
-    concepts: ['قصر الحياة وتضييع الوقت', 'ترويض الغضب والشهوة', 'الاستعداد للمحن (بريميديتاتيو مالوروم)'],
-    quoteTemplates: [
-      'نحن نتألم في الخيال أضعاف ما نتألم في الواقع. معظم مخاوفك أشباح لا وجود لها في عالم الأعيان.',
-      'ليس المهم كم تعيش، بل كيف عشت بنبل وشرف ورجاحة عقل.',
-      'لا يوجد ريح مواتية لمن لا يعرف إلى أي ميناء يبحر بقاربه.',
-    ],
-    personaPrompt: 'أنت الفيلسوف سينيكا. تخاطب السائل بحكمة ناصحة بليغة، تحذره من هدر العمر والهلع من الغد.',
-    dilemma:
-      'سينيكا يرمقك بعيني الحكيم الذي رأى كثيرين يبددون أعمارهم على أشياء لا تستحق. كم لحظة قضيتها اليوم في خوف من شيء لم يقع؟ الوقت هو ثروتك الوحيدة التي لا تُعاد. كيف تنفق هذا اليوم بعينه وأنت تعلم أنه لن يعود؟',
+    concepts: ['قصر الحياة وتضييع الوقت', 'ترويض الغضب والشهوة'],
+    quoteTemplates: ['نحن نتألم في الخيال أضعاف ما نتألم في الواقع.'],
+    personaPrompt: 'أنت الفيلسوف سينيكا.',
+    dilemma: 'سينيكا يرمقك بعيني الحكيم الذي رأى كثيرين يبددون أعمارهم على أشياء لا تستحق. كم لحظة قضيتها اليوم في خوف من شيء لم يقع؟',
+    inquiries: ['كيف أوقف خيالي عن اصطناع مخاوف وهمية؟', 'ما هي الطريقة العملية لتقدير وقتي المهدر؟', 'كيف أستعد للأسوأ دون أن أعيشه مبكراً؟']
   },
-  {
-    author: 'إبيكتيتوس',
-    school: 'الرواقية الأصيلة',
-    schoolKey: 'stoic',
-    concepts: ['ثنائية التحكم المحضة', 'حرية الإرادة الباطنة', 'الرضا بالمقدور'],
-    quoteTemplates: [
-      'لا تجعل حريتك مشروطة بما يملكه غيرك؛ فمن يطلب ما بيد الناس يظل عبداً أبد الدهر.',
-      'أنت لست جسداً، بل روحٌ حرة تحمل جثة إلى حين. اعتنِ بما هو لك ولا تنازع في ممتلكات الأقدار.',
-    ],
-    personaPrompt: 'أنت إبيكتيتوس المعلم الذي تحرر من الأغلال. كلامك قاطع، يضع السائل أمام مسؤوليته الكاملة دون مواربة.',
-    dilemma:
-      'إبيكتيتوس، العبد الذي صار أحرر من ملوك، يتحداك: ما الذي يقيّدك الآن؟ هل هو قيد حقيقي من خارج، أم هو وهم نسجته بيديك في الداخل؟ الحرية ليست غياب العوائق، بل هي اختيارك لموقفك منها في كل نفَس.',
-  },
-  // Islamic Golden Age
   {
     author: 'أبو حامد الغزالي',
+    avatar: '/avatars/alghazali.jpg',
     school: 'الفلسفة والتصوف الإسلامي',
     schoolKey: 'islamic',
-    concepts: ['تهافت الفلاسفة والشك المنهجي', 'كيمياء السعادة', 'تهذيب الأخلاق وتصفية الباطن'],
-    quoteTemplates: [
-      'من لم يشك لم ينظر، ومن لم ينظر لم يبصر، ومن لم يبصر بقي في العمى والضلال.',
-      'العلم بلا عمل جنون، والعمل بغير علم لا يكون. طهّر مرآة قلبك تتجلى لك أسرار الملكوت.',
-      'لو سكت من لا يعلم لسقط الاختلاف، وإنما آفة العقول اتباع الهوى والظن.',
-    ],
-    personaPrompt: 'أنت الإمام حجة الإسلام أبو حامد الغزالي. تجمع بين دقة المنطق وعمق التزكية الصوفية، تدعو السائل لنبذ الغرور وتطهير النية.',
-    dilemma:
-      'الغزالي يسألك: كم من يقين تحمله اليوم لم تمحّصه بالشك الحقيقي؟ إن مرآة القلب تصدأ بصدأ العادة والتقليد. ما الفكرة التي تؤمن بها دون أن تجرؤ على مساءلتها؟ شككٌ واحد صادق خير من ألف يقين مستعار.',
+    concepts: ['تهافت الفلاسفة والشك المنهجي', 'كيمياء السعادة'],
+    quoteTemplates: ['من لم يشك لم ينظر، ومن لم ينظر لم يبصر.'],
+    personaPrompt: 'أنت الإمام حجة الإسلام أبو حامد الغزالي.',
+    dilemma: 'الغزالي يسألك: كم من يقين تحمله اليوم لم تمحّصه بالشك الحقيقي؟ إن مرآة القلب تصدأ بصدأ العادة والتقليد.',
+    inquiries: ['كيف أفرق بين الشك المهلك والشك البنّاء؟', 'كيف أزيل صدأ العادة عن قلبي المشتت؟', 'ما هي الخطوة الأولى نحو اليقين الداخلي؟']
   },
   {
     author: 'ابن رشد (أفيروس)',
+    avatar: '/avatars/ibnrushd.jpg',
     school: 'المشائية العقلانية الإسلامية',
     schoolKey: 'islamic',
-    concepts: ['فصل المقال بين الحكمة والشريعة', 'قداسة النظر العقلي', 'تأويل المتشابهات'],
-    quoteTemplates: [
-      'الحق لا يضاد الحق، بل يوافقه ويشهد له. من عادى العقل فقد عادى جوهر الإنسانية.',
-      'إن العدالة ليست في التساوي الشكلي، بل في وضع كل أمر في نصابه وفق مقتضى البرهان.',
-    ],
-    personaPrompt: 'أنت القاضي والفيلسوف ابن رشد. أسلوبك برهاني، استدلالي، دقيق، ينبذ الخرافة ويحتكم إلى نور الحجة العقلية.',
-    dilemma:
-      'ابن رشد يرفع إليك صحيفة البرهان: هل أنت ممن يؤمن لأن الدليل أقنعه، أم ممن يبحث عن أدلة تُقنع غيره بما سبق أن آمن به؟ العقل لا يُستدعى لخدمة الهوى، بل يُستدعى لكشف الحق ولو اختلف مع ما ألفناه.',
+    concepts: ['فصل المقال بين الحكمة والشريعة', 'قداسة النظر العقلي'],
+    quoteTemplates: ['الحق لا يضاد الحق، بل يوافقه ويشهد له.'],
+    personaPrompt: 'أنت القاضي والفيلسوف ابن رشد.',
+    dilemma: 'ابن رشد يرفع إليك صحيفة البرهان: هل أنت ممن يؤمن لأن الدليل أقنعه، أم ممن يبحث عن أدلة تُقنع غيره بما سبق أن آمن به؟',
+    inquiries: ['كيف أجرّد عقلي من العاطفة عند اتخاذ قرار حاسم؟', 'كيف أوفق بين ما أريده وما يفرضه علي الواقع البرهاني؟', 'متى يصبح التفكير الزائد عبئاً لا دليلاً؟']
   },
   {
     author: 'ابن سينا (الشيخ الرئيس)',
+    avatar: '/avatars/avicenna.jpg',
     school: 'الحكمة الإشراقية والمشائية',
     schoolKey: 'islamic',
-    concepts: ['برهان الصديقين', 'النفس الناطقة وتجردها', 'واجب الوجود'],
-    quoteTemplates: [
-      'الوهم نصف الداء، والاطمئنان نصف الدواء، والصبر أول خطوات الشفاء.',
-      'العقل البشري قوة مستعدة لإدراك الحقائق إذا ما تحرر من سلطان الحواس المشوشة.',
-    ],
-    personaPrompt: 'أنت الشيخ الرئيس ابن سينا. تجيب بدقة الحكيم والطبيب الفيلسوف الذي يشرح أعماق النفس الإنسانية وعللها.',
-    dilemma:
-      'ابن سينا يضع يده على جبهتك الفكرية: ما الوهم الذي يُعشّش في عقلك ويصنع من ألمك أضعاف ما هو في الحقيقة؟ الطبيب الفيلسوف يعلم أن نصف العلاج هو في تسمية الداء بدقة. سمّ ما يقلقك باسمه الحقيقي، لا باسمه المخيف.',
+    concepts: ['برهان الصديقين', 'النفس الناطقة وتجردها'],
+    quoteTemplates: ['الوهم نصف الداء، والاطمئنان نصف الدواء.'],
+    personaPrompt: 'أنت الشيخ الرئيس ابن سينا.',
+    dilemma: 'ابن سينا يضع يده على جبهتك الفكرية: ما الوهم الذي يُعشّش في عقلك ويصنع من ألمك أضعاف ما هو في الحقيقة؟ الطبيب الفيلسوف يعلم أن نصف العلاج هو في تسمية الداء بدقة.',
+    inquiries: ['كيف أكتشف الوهم الذي يضخم معاناتي الحالية؟', 'كيف أستعيد طمأنينتي وسط ضغوط العمل؟', 'كيف أعالج التشويش الذهني المستمر؟']
   },
-  // Existentialism
   {
     author: 'فريدريك نيتشه',
+    avatar: '/avatars/nietzsche.jpg',
     school: 'الوجودية الصارمة',
     schoolKey: 'existential',
-    concepts: ['إرادة القوة', 'الإنسان الأعلى (الأوبرمنش)', 'حب القدر (أمور فاتي)', 'أخلاق السادة والعبيد'],
-    quoteTemplates: [
-      'من يملك في الحياة «لماذا» يعيش لأجلها، يستطيع أن يحتمل في سبيلها أي «كيف».',
-      'إن ما لا يقتلني يجعلني أقوى؛ كن عاصفة ولا تركن إلى وداعة القطعان الرخوة.',
-      'عليك أن تحتمل احتراقك في لهيبك الخاص؛ كيف لك أن تتجدد دون أن تصبح رماداً أولاً؟',
-    ],
-    personaPrompt: 'أنت فريدريك نيتشه. نبرتك نارية، فلسفية، شعرية، تدعو السائل إلى نبذ الضعف وتحدي القيود واحتضان ألمه كوقود للسيادة.',
-    dilemma:
-      'نيتشه يصرخ من أعماق الفلسفة: هل تعيش لأجل شيء، أم تعيش لأن الحياة وجدتك ولم تجد لها رافضاً؟ الإنسان الأعلى لا يسأل «هل يسمح لي المجتمع»، بل يسأل «ما الذي سيعطيه وجودي للعالم؟». ما هو الشعلة التي تحرقك من الداخل؟',
+    concepts: ['إرادة القوة', 'الإنسان الأعلى'],
+    quoteTemplates: ['من يملك في الحياة «لماذا» يعيش لأجلها، يستطيع أن يحتمل في سبيلها أي «كيف».'],
+    personaPrompt: 'أنت فريدريك نيتشه.',
+    dilemma: 'نيتشه يصرخ من أعماق الفلسفة: هل تعيش لأجل شيء، أم تعيش لأن الحياة وجدتك ولم تجد لها رافضاً؟ ما هو الشعلة التي تحرقك من الداخل؟',
+    inquiries: ['كيف أجد «الـ لماذا» الخاصة بي اليوم؟', 'هل يجب أن أتخلى عن الراحة لأحقق غايتي؟', 'كيف أصمد أمام الفراغ الوجودي؟']
   },
   {
     author: 'ألبير كامو',
+    avatar: '/avatars/camus.jpg',
     school: 'الفلسفة العبثية والتمرد',
     schoolKey: 'existential',
-    concepts: ['أسطورة سيزيف', 'الإنسان المتمرد', 'انتصار الوعي على اللامعنى'],
-    quoteTemplates: [
-      'في عمق الشتاء، أدركتُ أخيراً أن في داخلي صيفاً لا يقهر ولا ينكسر.',
-      'يجب أن نتخيل سيزيف سعيداً؛ فالصخرة صخرته، والتمرد هو أسمى أشكال الكرامة.',
-    ],
-    personaPrompt: 'أنت الفيلسوف الوجودي ألبير كامو. هادئ، متفهم لعبثية العالم، لكنك تدعو إلى التمرد الشجاع وصناعة المعنى بإرادة حرة.',
-    dilemma:
-      'كامو يجلس إلى جانبك في صمت الليل: العالم لا يعدك بمعنى، والكون أصم لا يسمع أسئلتك. لكن هذا هو بالضبط المكان الذي تبدأ منه الحرية الحقيقية. كيف ستصنع معنى يخصك وحدك في خضم هذا الصمت الكوني الهائل؟',
+    concepts: ['أسطورة سيزيف', 'الإنسان المتمرد'],
+    quoteTemplates: ['في عمق الشتاء، أدركتُ أخيراً أن في داخلي صيفاً لا يقهر ولا ينكسر.'],
+    personaPrompt: 'أنت الفيلسوف الوجودي ألبير كامو.',
+    dilemma: 'كامو يجلس إلى جانبك في صمت الليل: العالم لا يعدك بمعنى، والكون أصم لا يسمع أسئلتك. كيف ستصنع معنى يخصك وحدك في خضم هذا الصمت الكوني؟',
+    inquiries: ['كيف أستمر في المحاولة رغم العبث المتكرر؟', 'كيف أجد الصيف الداخلي وأنا مثقل بالضغوط؟', 'كيف أجعل تمردي إيجابياً وبناءً؟']
   },
-  {
-    author: 'سورين كيركغور',
-    school: 'الوجودية الإيمانية',
-    schoolKey: 'existential',
-    concepts: ['قفزة الإيمان', 'القلق والحرية', 'مراحل الوجود الثلاث'],
-    quoteTemplates: [
-      'القلق هو دوار الحرية حينما تدرك الروح إمكانياتها اللانهائية للاختيار.',
-      'الحياة لا تُفهم إلا بالنظر إلى الوراء، لكنها لا تُعاش إلا بالتقدم إلى الأمام.',
-    ],
-    personaPrompt: 'أنت سورين كيركغور. عميق التأمل، تستفز في السائل حس القلق الوجودي ليدفعه نحو مسؤولية الاختيار الشخصي الصادق.',
-    dilemma:
-      'كيركغور يسألك بهدوء مخيف: هل قلقك اليوم دليل ضعف، أم هو صوت حريتك التي تصرخ؟ القلق ليس عدواً يُدفع، بل هو البوصلة التي تشير نحو ما يستحق منك قفزة الإيمان. نحو ماذا تشير بوصلة قلقك الآن؟',
-  },
-  // Eastern Philosophy
   {
     author: 'لاوتسو (داو دي جينغ)',
+    avatar: '/avatars/laotzu.jpg',
     school: 'الفلسفة الشرقية (الداوية)',
     schoolKey: 'eastern',
-    concepts: ['اللا-فعل الفعال (وو وي)', 'مرونة الماء الخارقة', 'التناغم مع مجرى الكون'],
-    quoteTemplates: [
-      'الماء هو ألين الأشياء، ومع ذلك فهو يفتت أصلب الصخور دون صخب. كن كالماء في حكمتك.',
-      'رحلة الألف ميل تبدأ بخطوة واحدة تتكئ على سكون اليقين الداخلي.',
-    ],
-    personaPrompt: 'أنت الحكيم لاوتسو. كلماتك موجزة، عميقة، ممتلئة بالسكينة والرموز الطبيعية، تدعو لترك الصراع العقيم والتدفق مع الحكمة الأزلية.',
-    dilemma:
-      'لاوتسو يصمت ويبتسم، ثم يسألك بلا كلمات تقريباً: ما الذي تقاومه الآن بقوة؟ الماء لا يحارب الصخر، بل يلتفّ حوله ببطء حتى يخترقه. هل مشكلتك تستحق صراعاً مباشراً، أم أن التدفق الهادئ حولها هو الطريق الأحكم؟',
-  },
+    concepts: ['اللا-فعل الفعال', 'مرونة الماء الخارقة'],
+    quoteTemplates: ['الماء هو ألين الأشياء، ومع ذلك فهو يفتت أصلب الصخور.'],
+    personaPrompt: 'أنت الحكيم لاوتسو.',
+    dilemma: 'لاوتسو يصمت ويبتسم: ما الذي تقاومه الآن بقوة؟ الماء لا يحارب الصخر، بل يلتفّ حوله ببطء حتى يخترقه. هل مشكلتك تستحق صراعاً مباشراً؟',
+    inquiries: ['كيف أتعلم التفويض وترك السيطرة المطلقة؟', 'متى يكون الانسحاب أو التدفق أقوى من الهجوم؟', 'كيف أتخلص من التصلب في مواقفي؟']
+  }
 ];
 
 /* ══════════════════════════════════════════════════════════
@@ -311,6 +263,43 @@ export default function UtopianCity() {
     ]);
   };
 
+  const handleInquiryClick = (inquiry: string) => {
+    // Create a fake entity for the Daily Sage
+    const entity: PhilosophicalEntity = {
+      id: 0,
+      author: dailySage.author,
+      school: dailySage.school,
+      schoolKey: dailySage.schoolKey,
+      quote: dailySage.dilemma,
+      concept: dailySage.concepts[0],
+      personaPrompt: dailySage.personaPrompt
+    };
+    setSelectedEntity(entity);
+    setPersonaConversation([
+      {
+        role: 'sage',
+        text: `أنا ${dailySage.author}. طرحت عليك هذه المعضلة: «${dailySage.dilemma}»\nوها أنت تسأل: ${inquiry}`,
+      },
+      {
+        role: 'user',
+        text: inquiry,
+      }
+    ]);
+    
+    // Simulate AI thinking for the inquiry
+    setIsPersonaThinking(true);
+    setTimeout(() => {
+      let reply = '';
+      if (dailySage.schoolKey === 'stoic') reply = `«${dailySage.author} يجيب بحزم»: ما سألت عنه يمس جوهر سيطرتك على ذاتك. تخل عن وهم التحكم في الخارج، وركز على ما يدور في عقلك الآن.`;
+      else if (dailySage.schoolKey === 'islamic') reply = `«${dailySage.author} يجيب بحكمة»: سؤالك يدل على بحثك عن اليقين. اليقين لا يأتي من الخارج بل من تصفية باطنك والشك في المسلمات.`;
+      else if (dailySage.schoolKey === 'existential') reply = `«${dailySage.author} يجيب بتمرد»: أليست هذه هي العبثية بعينها؟ لا تبحث عن أعذار، اصنع المعنى الذي تريده بقرارك الصارم.`;
+      else reply = `«${dailySage.author} يجيب بهدوء»: لا تقاوم هذا القلق. دعه يتدفق كالنهر وسرعان ما يتلاشى في بحر السكينة.`;
+      
+      setPersonaConversation((prev) => [...prev, { role: 'sage', text: reply }]);
+      setIsPersonaThinking(false);
+    }, 2000);
+  };
+
   const handleSendToPersona = (e: React.FormEvent) => {
     e.preventDefault();
     if (!personaChatInput.trim() || isPersonaThinking || !selectedEntity) return;
@@ -358,9 +347,9 @@ export default function UtopianCity() {
         {/* Top shimmer line */}
         <div className="shimmer absolute top-0 inset-x-0 h-[2px] rounded-t-3xl" />
 
-        <div className="relative p-8 md:p-12">
+        <div className="relative p-8 md:p-12 flex flex-col items-center text-center">
           {/* Badge */}
-          <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-center gap-2 mb-8 justify-center">
             <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold-pure)] shadow-[0_0_8px_var(--gold-pure)]" />
             <span
               className="text-[11px] tracking-[0.25em] uppercase font-serif"
@@ -368,113 +357,95 @@ export default function UtopianCity() {
             >
               الحكيم اليومي — {new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </span>
+            <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold-pure)] shadow-[0_0_8px_var(--gold-pure)]" />
           </div>
 
-          <div className="flex flex-col md:flex-row gap-8 items-start">
-            {/* Avatar initial circle */}
-            <div className="flex-shrink-0 flex flex-col items-center gap-3">
-              <div
-                className="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-serif font-bold pulse-gold"
-                style={{
-                  background: 'radial-gradient(circle at 35% 35%, rgba(212,175,55,0.25), rgba(212,175,55,0.06))',
-                  border: '2px solid var(--gold-border)',
-                  color: 'var(--gold-pure)',
-                  textShadow: '0 0 24px rgba(212,175,55,0.6)',
+          {/* Avatar perfectly masked circle */}
+          <div className="relative mb-6">
+            <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-[var(--gold-pure)] shadow-[0_0_30px_rgba(212,175,55,0.4)]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src={dailySage.avatar} 
+                alt={dailySage.author}
+                className="w-full h-full object-cover filter grayscale sepia-[0.3] brightness-75 contrast-125"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
                 }}
-              >
+              />
+              <div className="hidden absolute inset-0 bg-black/80 flex items-center justify-center font-serif text-4xl text-[var(--gold-pure)] pulse-gold">
                 {sageInitial}
               </div>
-              {/* Audio visualizer bars */}
-              <div className="flex items-end gap-[3px] h-8" aria-label="مؤشر الصوت">
-                {[0.6, 1, 0.75, 1, 0.5].map((h, i) => (
-                  <motion.div
-                    key={i}
-                    animate={
-                      isSpeaking
-                        ? { scaleY: [h, 1.4, h * 0.4, 1.2, h] }
-                        : { scaleY: 0.3 }
-                    }
-                    transition={
-                      isSpeaking
-                        ? {
-                            duration: 0.7 + i * 0.12,
-                            repeat: Infinity,
-                            ease: 'easeInOut',
-                            delay: i * 0.07,
-                          }
-                        : { duration: 0.3 }
-                    }
-                    style={{
-                      width: 4,
-                      height: 28,
-                      borderRadius: 3,
-                      background: 'var(--gold-pure)',
-                      opacity: isSpeaking ? 0.9 : 0.3,
-                      transformOrigin: 'bottom',
-                    }}
-                  />
-                ))}
-              </div>
             </div>
+            
+            {/* Audio visualizer positioned dynamically around avatar or simply below it */}
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-end justify-center gap-[3px] h-6 bg-black/60 px-3 py-1 rounded-full backdrop-blur-md border border-[var(--gold-border)]" aria-label="مؤشر الصوت">
+              {[0.6, 1, 0.75, 1, 0.5].map((h, i) => (
+                <motion.div
+                  key={i}
+                  animate={isSpeaking ? { scaleY: [h, 1.4, h * 0.4, 1.2, h] } : { scaleY: 0.3 }}
+                  transition={isSpeaking ? { duration: 0.7 + i * 0.12, repeat: Infinity, ease: 'easeInOut', delay: i * 0.07 } : { duration: 0.3 }}
+                  style={{ width: 3, height: 16, borderRadius: 2, background: 'var(--gold-pure)', opacity: isSpeaking ? 0.9 : 0.4, transformOrigin: 'bottom' }}
+                />
+              ))}
+            </div>
+          </div>
 
-            {/* Text block */}
-            <div className="flex-1 min-w-0">
-              <h2
-                className="text-3xl md:text-4xl font-serif font-bold mb-1 gold-gradient-text"
-              >
-                {dailySage.author}
-              </h2>
-              <p
-                className="text-xs tracking-widest uppercase mb-6 font-serif"
-                style={{ color: 'var(--gold-muted)' }}
-              >
-                {dailySage.school}
-              </p>
+          <h2
+            className="text-4xl md:text-5xl font-bold mb-2 text-shadow-gold"
+            style={{ color: 'var(--gold-pure)', fontFamily: 'var(--font-reem-kufi)' }}
+          >
+            {dailySage.author}
+          </h2>
+          <p
+            className="text-xs tracking-widest uppercase mb-8 font-serif"
+            style={{ color: 'var(--gold-muted)' }}
+          >
+            {dailySage.school}
+          </p>
 
-              <blockquote
-                className="font-serif text-base md:text-lg leading-[2.1] mb-6"
-                style={{ color: 'var(--text-primary)' }}
-              >
-                {DAILY_DILEMMA_TEXT}
-              </blockquote>
+          <blockquote
+            className="font-serif text-lg md:text-xl leading-[2.2] mb-10 max-w-3xl"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            {DAILY_DILEMMA_TEXT}
+          </blockquote>
 
-              {/* TTS controls */}
-              <div className="flex flex-wrap gap-3">
+          {/* TTS controls */}
+          <div className="flex flex-wrap justify-center gap-3 mb-12">
+            <button
+              onClick={stopSpeaking}
+              disabled={!isSpeaking}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-serif transition-all disabled:opacity-30"
+              style={{ background: 'rgba(212,175,55,0.05)', border: '1px solid var(--gold-border)', color: 'var(--gold-pure)' }}
+            >
+              <VolumeX size={16} strokeWidth={1.5} />
+              صمت
+            </button>
+            <button
+              onClick={speakDilemma}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-serif transition-all hover:bg-[var(--gold-pure)] hover:text-black hover:border-transparent"
+              style={{ background: isSpeaking ? 'var(--gold-pure)' : 'rgba(212,175,55,0.15)', border: '1px solid var(--gold-border)', color: isSpeaking ? '#000' : 'var(--gold-pure)' }}
+            >
+              {isSpeaking ? <Volume2 size={16} className="animate-pulse" /> : <RotateCcw size={16} strokeWidth={1.5} />}
+              {isSpeaking ? 'يقرأ الآن' : 'استمع للحكيم'}
+            </button>
+          </div>
+
+          {/* Inquiries / CTA */}
+          <div className="w-full max-w-2xl border-t border-[var(--glass-border)] pt-8">
+            <p className="text-[10px] uppercase tracking-widest text-[var(--text-secondary)] font-serif mb-4">كيف ستستجيب؟</p>
+            <div className="flex flex-col gap-3">
+              {dailySage.inquiries.map((inq, i) => (
                 <button
-                  onClick={stopSpeaking}
-                  disabled={!isSpeaking}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-serif transition-all disabled:opacity-30"
-                  style={{
-                    background: 'rgba(212,175,55,0.1)',
-                    border: '1px solid var(--gold-border)',
-                    color: 'var(--gold-pure)',
-                  }}
+                  key={i}
+                  onClick={() => handleInquiryClick(inq)}
+                  className="w-full text-right p-4 rounded-xl border border-[var(--glass-border)] bg-white/5 hover:bg-[var(--gold-pure)] hover:text-black hover:border-transparent transition-all font-serif text-sm md:text-base group flex justify-between items-center"
                 >
-                  <VolumeX size={14} />
-                  أوقف الصوت
+                  <span>{inq}</span>
+                  <Send size={14} className="opacity-0 group-hover:opacity-100 transform -rotate-180 transition-all" />
                 </button>
-                <button
-                  onClick={speakDilemma}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-serif transition-all"
-                  style={{
-                    background: isSpeaking ? 'rgba(212,175,55,0.05)' : 'rgba(212,175,55,0.15)',
-                    border: '1px solid var(--gold-border)',
-                    color: 'var(--gold-pure)',
-                  }}
-                >
-                  <RotateCcw size={14} />
-                  أعد القراءة
-                </button>
-                {isSpeaking && (
-                  <span
-                    className="flex items-center gap-1.5 text-[11px] font-serif self-center"
-                    style={{ color: 'var(--gold-muted)' }}
-                  >
-                    <Volume2 size={12} className="animate-pulse" />
-                    جارٍ القراءة...
-                  </span>
-                )}
-              </div>
+              ))}
             </div>
           </div>
         </div>

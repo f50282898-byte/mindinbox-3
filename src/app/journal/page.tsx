@@ -18,6 +18,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/store/useStore';
 import { db } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
+import FaradayOverlay from '@/components/FaradayOverlay';
 
 export default function CatharsisJournal() {
   const { user } = useStore();
@@ -84,6 +85,11 @@ export default function CatharsisJournal() {
   };
 
   const handleExportTome = () => {
+    if (!content.trim()) {
+      window.dispatchEvent(new CustomEvent('leapOfFaith'));
+      return;
+    }
+
     setIsExporting(true);
     setTimeout(() => {
       setIsExporting(false);
@@ -114,7 +120,7 @@ export default function CatharsisJournal() {
   };
 
   return (
-    <>
+    <FaradayOverlay>
       <div className="w-full max-w-4xl mx-auto fade-in pb-36 print-hide" dir="rtl">
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pt-4">
@@ -313,6 +319,6 @@ export default function CatharsisJournal() {
           </div>
         </div>
       </div>
-    </>
+    </FaradayOverlay>
   );
 }

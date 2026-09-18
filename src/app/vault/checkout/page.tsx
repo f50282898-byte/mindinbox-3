@@ -6,43 +6,41 @@ import { motion } from 'framer-motion';
 import {
   ArrowLeft,
   CheckCircle2,
-  CreditCard,
   Crown,
   Lock,
   ShieldCheck,
-  
+  AlertTriangle
 } from 'lucide-react';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { useStore } from '@/store/useStore';
 
-const PLAN_PRICE = 19.99;
-const COMMUNITY_MEMBER_COUNT = 34;
+type Tier = 'quarterly' | 'semi' | 'annual';
+
+const TIERS = {
+  quarterly: { id: 'quarterly', price: 19.99, title: 'اشتراك ربع سنوي (دفع شهري)', label: '$19.99 / شهر' },
+  semi: { id: 'semi', price: 49.99, title: 'اشتراك نصف سنوي', label: '$49.99 إجمالي' },
+  annual: { id: 'annual', price: 149.99, title: 'اشتراك سنوي', label: '$149.99 إجمالي' },
+};
 
 export default function VaultCheckoutPage() {
   const router = useRouter();
   const { user, isPro, setIsPro, setPhone } = useStore();
-  const [phoneNumber, setPhoneNumber] = useState(user.phone ?? '');
+  const [selectedTier, setSelectedTier] = useState<Tier>('semi');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleCheckout = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!phoneNumber.trim()) return;
-
+  const handleCheckout = async () => {
     setIsSubmitting(true);
 
     try {
-      setPhone(phoneNumber.trim());
       setIsPro(true);
-
       await setDoc(
         doc(db, 'users', user.uid),
         {
-          phone: phoneNumber.trim(),
           isPro: true,
           covenantSealedAt: new Date().toISOString(),
-          tier: 'sovereign_pro',
+          tier: selectedTier,
         },
         { merge: true }
       );
@@ -69,14 +67,16 @@ export default function VaultCheckoutPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-lg rounded-3xl border border-[#D4AF37]/25 bg-[#0A0A0A]/90 p-10 text-center shadow-[0_30px_80px_rgba(0,0,0,0.8)]"
+          className="w-full max-w-lg rounded-3xl border border-[var(--gold-border)] bg-black/80 backdrop-blur-3xl p-10 text-center shadow-[0_30px_80px_rgba(0,0,0,0.8)]"
         >
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#D4AF37] to-[#AA7C11] text-black shadow-[0_0_30px_rgba(212,175,55,0.35)]">
             <CheckCircle2 size={36} />
           </div>
-          <h1 className="font-serif text-3xl font-bold text-[#EAEAEA]">تم تأكيد الدفع بنجاح</h1>
-          <p className="mt-4 text-sm leading-8 text-[#CFC29A]">
-            تم تفعيل عضوية العهد السيادي. سيعاد توجيهك إلى صفحة الميثاق خلال لحظات.
+          <h1 className="font-serif text-3xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-reem-kufi)' }}>
+            تم ختم العهد السيادي
+          </h1>
+          <p className="mt-4 text-sm leading-8 text-[var(--gold-muted)]">
+            أهلاً بك في طبقة النخبة. سيتم توجيهك إلى ملاذك الآمن الآن.
           </p>
         </motion.div>
       </main>
@@ -85,130 +85,132 @@ export default function VaultCheckoutPage() {
 
   return (
     <main className="min-h-screen px-4 py-10" dir="rtl">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-4xl">
         <button
           type="button"
           onClick={() => router.push('/vault')}
-          className="mb-6 inline-flex items-center gap-2 text-sm text-[#D4AF37] hover:text-[#E8CC6A]"
+          className="mb-8 inline-flex items-center gap-2 text-sm text-[var(--gold-pure)] hover:brightness-125 transition-all"
         >
           <ArrowLeft size={16} />
-          العودة إلى الميثاق
+          <span className="font-serif">العودة للخلف</span>
         </button>
 
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="flex flex-col gap-10">
+          
+          {/* THE LOSS AVERSION STACK */}
           <motion.section
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-3xl border border-[#D4AF37]/20 bg-[#0A0A0A]/80 p-6 md:p-8 shadow-[0_25px_60px_rgba(0,0,0,0.75)]"
+            className="rounded-3xl border border-red-900/30 bg-red-950/10 backdrop-blur-md p-8 shadow-[0_15px_40px_rgba(0,0,0,0.8)] relative overflow-hidden"
           >
-            <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#D4AF37]/35 bg-[#D4AF37]/10 text-[#D4AF37]">
-                <Crown size={22} />
+            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-red-500/40 to-transparent" />
+            <div className="flex items-center gap-3 mb-6">
+              <AlertTriangle className="text-red-500" size={24} />
+              <h2 className="text-2xl font-bold text-red-50" style={{ fontFamily: 'var(--font-reem-kufi)' }}>
+                ماذا تخسر إن غادرت الآن؟
+              </h2>
+            </div>
+            
+            <div className="space-y-4 font-serif text-sm">
+              <div className="flex justify-between items-center text-red-300/50 relative">
+                <span className="relative z-10">جلسات استشارية تقليدية</span>
+                <span className="relative z-10">$300/شهر</span>
+                <div className="absolute inset-0 top-1/2 w-full h-[1px] bg-red-500 z-20 transform -translate-y-1/2 rotate-1" />
               </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[#D4AF37]">العهد السيادي</p>
-                <h1 className="font-serif text-2xl font-bold text-[#F5F0E3]">صفحة الدفع</h1>
+              <div className="flex justify-between items-center text-red-300/50 relative">
+                <span className="relative z-10">فوضى الملاحظات المتناثرة والضياع الفكري</span>
+                <span className="relative z-10">هدر الوقت والطاقة</span>
+                <div className="absolute inset-0 top-1/2 w-full h-[1px] bg-red-500 z-20 transform -translate-y-1/2 -rotate-1" />
+              </div>
+              
+              <div className="pt-4 mt-4 border-t border-red-900/30 flex justify-between items-center">
+                <span className="text-[var(--gold-pure)] font-bold text-lg">حماية عقلك وارتقاؤه:</span>
+                <span className="text-[var(--gold-pure)] font-bold text-lg px-4 py-1 bg-[var(--gold-pure)]/10 rounded-lg border border-[var(--gold-pure)]/30">
+                  يبدأ من $19.99 فقط
+                </span>
               </div>
             </div>
-
-            <div className="mb-6 rounded-2xl border border-[#D4AF37]/15 bg-[#D4AF37]/5 p-5">
-              <div className="flex items-end justify-between gap-3">
-                <div>
-                  <p className="text-xs tracking-[0.18em] text-[#D4AF37]">اشتراك شهري</p>
-                  <div className="mt-2 flex items-end gap-2">
-                    <span className="font-serif text-5xl font-bold text-[#E8CC6A]">${PLAN_PRICE.toFixed(2)}</span>
-                    <span className="pb-2 text-sm text-[#CFC29A]">/ شهر</span>
-                  </div>
-                </div>
-                <div className="rounded-full border border-[#D4AF37]/20 bg-black/20 px-3 py-1 text-[10px] text-[#D4AF37]">
-                  {COMMUNITY_MEMBER_COUNT} أعضاء فعليين
-                </div>
-              </div>
-            </div>
-
-            <ul className="space-y-3 text-sm text-[#E5D7B7]">
-              {[
-                'وصول كامل إلى المجلس السري',
-                'تقرير نفسي شهري جذري',
-                'تحويل اليوميات إلى بودكاست',
-                'فتح كل السمات السيادية للمستخدم',
-              ].map((item) => (
-                <li key={item} className="flex items-center gap-3">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#D4AF37]/15 text-[#D4AF37]">
-                    <CheckCircle2 size={14} />
-                  </span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
           </motion.section>
 
+          {/* THE 3-TIER DISPLAY */}
           <motion.section
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-            className="rounded-3xl border border-[#D4AF37]/20 bg-[#090909]/90 p-6 md:p-8 shadow-[0_25px_60px_rgba(0,0,0,0.75)]"
+            transition={{ delay: 0.1 }}
           >
-            <div className="mb-5 flex items-center gap-2 text-[#D4AF37]">
-              <ShieldCheck size={18} />
-              <span className="text-xs uppercase tracking-[0.18em]">تأكيد الدفع</span>
+            <div className="mb-6 flex items-center justify-center gap-3">
+              <Crown size={28} className="text-[var(--gold-pure)]" />
+              <h1 className="text-3xl font-bold text-[var(--gold-pure)] text-shadow-gold" style={{ fontFamily: 'var(--font-reem-kufi)' }}>
+                ميثاق العهد السيادي
+              </h1>
             </div>
 
-            <form onSubmit={handleCheckout} className="space-y-5">
-              <div>
-                <label className="mb-2 block text-xs text-[#D4AF37]">رقم الهاتف</label>
-                <input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="+966 5X XXX XXXX"
-                  required
-                  dir="ltr"
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-[#F5F0E3] placeholder-[#888888] focus:border-[#D4AF37] focus:outline-none"
-                />
-              </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {(Object.keys(TIERS) as Tier[]).map((key) => {
+                const tier = TIERS[key];
+                const isSelected = selectedTier === key;
+                const isWise = key === 'semi';
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-                <div className="mb-3 flex items-center justify-between text-sm text-[#E5D7B7]">
-                  <span>الباقة المختارة</span>
-                  <span className="text-[#D4AF37] font-semibold">العهد السيادي</span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-[#E5D7B7]">
-                  <span>المبلغ</span>
-                  <span className="font-semibold text-[#F5F0E3]">${PLAN_PRICE.toFixed(2)}</span>
-                </div>
-              </div>
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setSelectedTier(key)}
+                    className={`relative p-6 rounded-2xl border text-right transition-all duration-300 flex flex-col ${
+                      isSelected 
+                        ? 'bg-[var(--gold-pure)]/10 border-[var(--gold-pure)] shadow-[0_0_30px_rgba(212,175,55,0.2)] scale-105'
+                        : 'bg-black/60 border-white/10 hover:border-white/30 hover:bg-white/5'
+                    }`}
+                  >
+                    {isWise && (
+                      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[var(--gold-pure)] text-black px-4 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase shadow-[0_0_10px_var(--gold-pure)]">
+                        الخيار الأحكم
+                      </div>
+                    )}
+                    <h3 className="font-serif text-lg text-[var(--text-primary)] mb-2">{tier.title}</h3>
+                    <div className="text-2xl font-bold text-[var(--gold-pure)] mt-auto pt-4 font-mono">
+                      {tier.label}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
 
-              <div className="rounded-2xl border border-[#D4AF37]/15 bg-[#D4AF37]/5 p-4 text-xs leading-7 text-[#CFC29A]">
-                <div className="mb-2 flex items-center gap-2 text-[#D4AF37]">
-                  <Lock size={14} />
-                  <span>دفع آمن</span>
-                </div>
-                تفاصيل الدفع محفوظة بشكل آمن، مع خيار إلغاء فوري في أي وقت.
-              </div>
-
+            <div className="mt-10 flex justify-center">
               <button
-                type="submit"
-                disabled={isSubmitting || !phoneNumber.trim()}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#AA7C11] to-[#D4AF37] px-4 py-4 text-sm font-bold text-black shadow-[0_0_24px_rgba(212,175,55,0.3)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={handleCheckout}
+                disabled={isSubmitting}
+                className="group relative flex items-center justify-center gap-3 w-full max-w-md bg-gradient-to-r from-[#AA7C11] to-[#D4AF37] px-6 py-5 rounded-2xl text-black font-bold shadow-[0_0_30px_rgba(212,175,55,0.4)] hover:shadow-[0_0_50px_rgba(212,175,55,0.6)] transition-all disabled:opacity-50"
               >
                 {isSubmitting ? (
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent" />
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-black border-t-transparent" />
                 ) : (
-                  <CreditCard size={16} />
+                  <Lock size={18} />
                 )}
-                <span>{isSubmitting ? 'جارٍ تأكيد الدفع...' : 'تأكيد الدفع — $19.99'}</span>
+                <span className="text-lg" style={{ fontFamily: 'var(--font-reem-kufi)' }}>
+                  {isSubmitting ? 'جارٍ الختم...' : 'أبرم العهد الآن'}
+                </span>
+                
+                {/* Glow effect on hover */}
+                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 border-2 border-white/40 transition-opacity pointer-events-none" />
               </button>
+            </div>
 
-              <div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[#888888]">
-                <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold-pure)] shadow-[0_0_8px_var(--gold-pure)]" />
-                <span>إلغاء فوري · تشفير بنكي</span>
-              </div>
-            </form>
           </motion.section>
+
+          {/* THE LUXURY GUARANTEE */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-center mt-4"
+          >
+            <p className="text-[#888] text-xs max-w-lg mx-auto leading-relaxed" style={{ fontFamily: 'var(--font-reem-kufi)' }}>
+              ميثاق الشرف السيادي: إن لم تتسع آفاق عقلك خلال 30 يوماً، يُسترد استثمارك بنقرة.
+            </p>
+          </motion.div>
+
         </div>
       </div>
     </main>
   );
 }
-
