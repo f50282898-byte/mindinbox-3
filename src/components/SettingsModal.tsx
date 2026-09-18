@@ -2,19 +2,26 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, X, Moon, Sun, User, LogOut } from 'lucide-react';
+import { Settings, X, Moon, Sun, User, LogOut, Volume2, Save, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useStore } from '@/store/useStore';
 import { auth } from '@/firebase';
-import { signOut } from 'firebase/auth';
+import { signOut, updateProfile } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
 export default function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { currentUser } = useAuth();
-  const { user, isPro } = useStore();
+  const { user, isPro, audioSpeed, setAudioSpeed } = useStore();
   const router = useRouter();
   
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [displayName, setDisplayName] = useState(currentUser?.displayName || user.displayName || '');
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
+
+  useEffect(() => {
+    setDisplayName(currentUser?.displayName || user.displayName || '');
+  }, [currentUser, user.displayName, isOpen]);
 
   // Enforce dark theme by default as per luxury guidelines
   useEffect(() => {
@@ -36,6 +43,29 @@ export default function SettingsModal({ isOpen, onClose }: { isOpen: boolean; on
     }
   };
 
+  const handleSaveProfile = async () => {
+    setIsSaving(true);
+    try {
+      if (auth?.currentUser) {
+        await updateProfile(auth.currentUser, { displayName });
+      }
+      // Also update local store if we wanted to
+      setTimeout(() => setIsSaving(false), 800);
+    } catch (e) {
+      console.error(e);
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (auth?.currentUser) {
+      // In a real app we'd require re-authentication for deletion
+      await auth.currentUser.delete().catch(() => alert('يلزم إعادة تسجيل الدخول لتأكيد الحذف'));
+      onClose();
+      router.push('/auth');
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -50,15 +80,15 @@ export default function SettingsModal({ isOpen, onClose }: { isOpen: boolean; on
             initial={{ scale: 0.95, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.95, y: 20 }}
-            className="w-full max-w-md p-6 rounded-3xl glass-card relative overflow-hidden"
+            className="w-full max-w-md p-6 rounded-3xl bg-black/80 backdrop-blur-xl border border-white/5 relative overflow-hidden shadow-2xl"
           >
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-[var(--glass-border)]">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-[var(--gold-glow)] flex items-center justify-center text-[var(--gold-pure)] border border-[var(--gold-border)]">
-                  <Settings size={20} />
+                  <Settings size={20} strokeWidth={1.5} />
                 </div>
                 <div>
-                  <h3 className="font-serif text-lg font-bold text-[var(--text-primary)]">الإعدادات</h3>
+                  <h3 className="font-serif text-lg font-bold text-[var(--text-primary)]">الإعدادات المتقدمة</h3>
                   <p className="text-xs text-[var(--text-secondary)]">تخصيص تجربتك الباطنية</p>
                 </div>
               </div>
@@ -67,49 +97,37 @@ export default function SettingsModal({ isOpen, onClose }: { isOpen: boolean; on
               </button>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2 scrollbar-hide">
               {/* Account Info */}
               <div>
-                <h4 className="text-xs uppercase tracking-widest text-[var(--gold-muted)] mb-3 font-semibold">حسابك</h4>
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--gold-dim)] to-black flex items-center justify-center border border-[var(--gold-border)] text-[var(--gold-pure)] shrink-0 overflow-hidden">
-                    {currentUser?.photoURL ? (
-                      <img src={currentUser.photoURL} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <User size={20} />
-                    )}
+                <h4 className="text-[10px] uppercase tracking-widest text-[var(--gold-muted)] mb-3 font-semibold">الهوية</h4>
+                <div className="space-y-3">
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--gold-pure)] font-serif"
+                      placeholder="اسمك المستعار"
+                    />
+                    <button 
+                      onClick={handleSaveProfile}
+                      disabled={isSaving || displayName === (currentUser?.displayName || user.displayName)}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 text-[var(--gold-pure)] disabled:opacity-30 disabled:text-gray-500 hover:bg-white/5 rounded-lg transition-colors"
+                    >
+                      {isSaving ? <div className="w-4 h-4 rounded-full border-2 border-[var(--gold-pure)] border-t-transparent animate-spin" /> : <Save size={16} />}
+                    </button>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-serif font-bold text-[var(--text-primary)] truncate">{currentUser?.displayName || user.displayName}</p>
-                    <p className="text-xs text-[var(--text-secondary)] truncate">{currentUser?.email || 'لا يوجد بريد إلكتروني'}</p>
+                  <div className="w-full bg-white/5 border border-transparent rounded-xl px-4 py-3 text-sm text-[var(--text-muted)] font-sans cursor-not-allowed">
+                    {currentUser?.email || 'لا يوجد بريد إلكتروني'}
                   </div>
-                  <span className={`text-[10px] px-2 py-1 rounded-full border font-bold shrink-0 ${
-                    isPro
-                      ? 'bg-[var(--gold-glow)] text-[var(--gold-pure)] border-[var(--gold-border)]'
-                      : 'bg-white/5 text-[var(--text-muted)] border-white/10'
-                  }`}>
-                    {isPro ? '⬡ سيادي' : 'مجاني'}
-                  </span>
                 </div>
               </div>
 
               {/* Theme Settings */}
               <div>
-                <h4 className="text-xs uppercase tracking-widest text-[var(--gold-muted)] mb-3 font-semibold">السمة البصرية (المزاج)</h4>
-                
+                <h4 className="text-[10px] uppercase tracking-widest text-[var(--gold-muted)] mb-3 font-semibold">مظهر المنصة</h4>
                 <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setTheme('light')}
-                    className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all ${
-                      theme === 'light'
-                        ? 'bg-[var(--gold-glow)] border-[var(--gold-border)] text-[var(--gold-pure)]'
-                        : 'bg-white/5 border-white/5 text-[var(--text-secondary)] hover:bg-white/10'
-                    }`}
-                  >
-                    <Sun size={24} className="mb-2" />
-                    <span className="text-xs font-serif font-bold">نهار فاخر</span>
-                  </button>
-                  
                   <button
                     onClick={() => setTheme('dark')}
                     className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all ${
@@ -118,21 +136,68 @@ export default function SettingsModal({ isOpen, onClose }: { isOpen: boolean; on
                         : 'bg-white/5 border-white/5 text-[var(--text-secondary)] hover:bg-white/10'
                     }`}
                   >
-                    <Moon size={24} className="mb-2" />
-                    <span className="text-xs font-serif font-bold">ليل باطني</span>
+                    <Moon size={20} strokeWidth={1.5} className="mb-2" />
+                    <span className="text-xs font-serif">ليل باطني</span>
+                  </button>
+                  <button
+                    onClick={() => setTheme('light')}
+                    className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all ${
+                      theme === 'light'
+                        ? 'bg-[var(--gold-glow)] border-[var(--gold-border)] text-[var(--gold-pure)]'
+                        : 'bg-white/5 border-white/5 text-[var(--text-secondary)] hover:bg-white/10'
+                    }`}
+                  >
+                    <Sun size={20} strokeWidth={1.5} className="mb-2" />
+                    <span className="text-xs font-serif">نهار فاخر</span>
                   </button>
                 </div>
               </div>
 
+              {/* Audio Speed */}
+              <div>
+                <h4 className="text-[10px] uppercase tracking-widest text-[var(--gold-muted)] mb-3 font-semibold">سرعة الصوت (الحكيم)</h4>
+                <div className="flex items-center gap-3 bg-black/40 border border-white/10 rounded-xl p-3">
+                  <Volume2 size={16} className="text-[var(--text-muted)]" />
+                  <input 
+                    type="range" 
+                    min="0.5" 
+                    max="2" 
+                    step="0.1" 
+                    value={audioSpeed} 
+                    onChange={(e) => setAudioSpeed(parseFloat(e.target.value))}
+                    className="flex-1 accent-[var(--gold-pure)]" 
+                  />
+                  <span className="text-xs font-mono text-[var(--gold-pure)] w-8 text-center">{audioSpeed}x</span>
+                </div>
+              </div>
+
               {/* Actions */}
-              <div className="pt-4 border-t border-[var(--glass-border)]">
+              <div className="pt-4 border-t border-white/5 space-y-3">
                 <button
                   onClick={handleSignOut}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-950/20 hover:bg-red-950/40 border border-red-900/30 text-sm font-bold text-red-500/90 hover:text-red-400 transition-all"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-sm text-[var(--text-primary)] transition-all"
                 >
-                  <LogOut size={16} />
-                  <span>تسجيل الخروج وترك المحراب</span>
+                  <LogOut size={16} strokeWidth={1.5} />
+                  <span className="font-serif">تسجيل الخروج</span>
                 </button>
+                
+                {isDeleteConfirm ? (
+                  <div className="p-4 rounded-xl border border-red-900/50 bg-red-950/20 text-center">
+                    <p className="text-xs text-red-400 mb-3 font-serif">هل أنت متأكد؟ هذا الإجراء لا يمكن التراجع عنه.</p>
+                    <div className="flex gap-2">
+                      <button onClick={handleDeleteAccount} className="flex-1 py-2 text-xs font-bold bg-red-600 hover:bg-red-500 text-white rounded-lg transition-colors">نعم، احذف</button>
+                      <button onClick={() => setIsDeleteConfirm(false)} className="flex-1 py-2 text-xs text-white bg-white/10 hover:bg-white/20 rounded-lg transition-colors">تراجع</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setIsDeleteConfirm(true)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl hover:bg-red-950/20 text-sm text-red-500/80 hover:text-red-400 transition-all border border-transparent hover:border-red-900/30"
+                  >
+                    <AlertCircle size={16} strokeWidth={1.5} />
+                    <span className="font-serif text-xs">حذف الحساب نهائياً</span>
+                  </button>
+                )}
               </div>
             </div>
           </motion.div>
@@ -141,4 +206,3 @@ export default function SettingsModal({ isOpen, onClose }: { isOpen: boolean; on
     </AnimatePresence>
   );
 }
-

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, Sparkles, Crown, Brain, Volume2, Mic } from 'lucide-react';
+import { Send, Volume2, Mic, StopCircle } from 'lucide-react';
 import { useStore, SageTier } from '@/store/useStore';
 import { useAudioEngine } from '@/hooks/useAudioEngine';
 
@@ -38,14 +38,29 @@ const getSagePersona = (tier: SageTier) => {
 };
 
 const SageAvatar = ({ tier, size = 20 }: { tier: SageTier; size?: number }) => {
-  if (tier === 'analytical') return <Brain size={size} />;
-  if (tier === 'sovereign') return <Crown size={size} />;
-  return <Bot size={size} />;
+  let src = '/avatars/avicenna.jpg';
+  if (tier === 'analytical') src = '/avatars/dostoevsky.jpg';
+  if (tier === 'sovereign') src = '/avatars/hypatia.jpg';
+  
+  return (
+    <div style={{ width: size, height: size }} className="rounded-full overflow-hidden bg-black flex items-center justify-center shrink-0">
+      <img 
+        src={src} 
+        alt="Sage Avatar" 
+        className="w-full h-full object-cover opacity-80"
+        onError={(e) => {
+          // Fallback if images don't exist yet
+          (e.target as HTMLImageElement).src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23111'/%3E%3Ccircle cx='50' cy='50' r='30' fill='%23222'/%3E%3C/svg%3E`;
+        }}
+      />
+    </div>
+  );
 };
 
 export default function SageChat() {
   const { sageTier, setSageTier, isPro } = useStore();
   const { speak, isRecording, startRecording, stopRecording } = useAudioEngine();
+  
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'init',
@@ -111,48 +126,48 @@ export default function SageChat() {
     <div className="flex flex-col h-[100svh] w-full" dir="rtl">
       
       {/* Tier Selector (Centered near top) */}
-      <div className="absolute top-28 inset-x-0 flex justify-center z-40 pointer-events-none px-4">
-        <div className="flex items-center gap-1.5 p-1.5 rounded-2xl glass-card pointer-events-auto shadow-2xl">
+      <div className="absolute top-24 md:top-28 inset-x-0 flex justify-center z-40 pointer-events-none px-4">
+        <div className="flex items-center gap-1.5 p-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[var(--glass-border)] pointer-events-auto shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
           <button
             onClick={() => setSageTier('standard')}
-            className={`px-4 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-full text-xs font-serif transition-all flex items-center gap-2 ${
               sageTier === 'standard'
                 ? 'bg-white/10 text-[#EAEAEA] shadow-sm'
                 : 'text-[var(--text-secondary)] hover:text-[#EAEAEA]'
             }`}
           >
-            <Sparkles size={14} className={sageTier === 'standard' ? 'text-[var(--gold-pure)]' : ''} />
+            <div className={`w-1.5 h-1.5 rounded-full ${sageTier === 'standard' ? 'bg-[var(--gold-pure)] shadow-[0_0_8px_var(--gold-pure)]' : 'bg-transparent'}`} />
             <span className="hidden sm:inline">القياسي</span>
           </button>
 
           <button
             onClick={() => setSageTier('analytical')}
-            className={`px-4 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-full text-xs font-serif transition-all flex items-center gap-2 ${
               sageTier === 'analytical'
-                ? 'bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30 shadow-sm'
+                ? 'bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20 shadow-sm'
                 : 'text-[var(--text-secondary)] hover:text-[#EAEAEA]'
             }`}
           >
-            <Brain size={14} className={sageTier === 'analytical' ? 'text-[#D4AF37]' : ''} />
+            <div className={`w-1.5 h-1.5 rounded-full ${sageTier === 'analytical' ? 'bg-[#D4AF37] shadow-[0_0_8px_#D4AF37]' : 'bg-transparent'}`} />
             <span className="hidden sm:inline">التحليلي</span>
           </button>
 
           <button
             onClick={() => setSageTier('sovereign')}
-            className={`px-4 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-full text-xs font-serif transition-all flex items-center gap-2 ${
               sageTier === 'sovereign'
-                ? 'bg-gradient-to-r from-[#AA7C11] to-[#D4AF37] text-black font-bold shadow-[0_0_15px_rgba(212,175,55,0.4)]'
-                : 'text-[var(--gold-pure)]/70 hover:text-[var(--gold-pure)]'
+                ? 'bg-gradient-to-r from-[#AA7C11]/20 to-[#D4AF37]/20 text-[var(--gold-pure)] border border-[var(--gold-border)] font-bold shadow-[0_0_15px_rgba(212,175,55,0.1)]'
+                : 'text-[var(--gold-pure)]/60 hover:text-[var(--gold-pure)]'
             }`}
           >
-            <Crown size={14} />
+            <div className={`w-1.5 h-1.5 rounded-full ${sageTier === 'sovereign' ? 'bg-[#D4AF37] shadow-[0_0_8px_#D4AF37]' : 'bg-transparent'}`} />
             <span className="hidden sm:inline">السيادي (Pro)</span>
           </button>
         </div>
       </div>
 
       {/* Messages Scroll View (Center) */}
-      <div className="flex-1 overflow-y-auto pt-44 pb-36 px-4 scrollbar-hide w-full relative z-30">
+      <div className="flex-1 overflow-y-auto pt-40 pb-36 px-4 scrollbar-hide w-full relative z-30">
         <div className="max-w-3xl mx-auto space-y-8">
           <AnimatePresence initial={false}>
             {messages.map((msg) => (
@@ -164,39 +179,36 @@ export default function SageChat() {
                 className={`flex w-full ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}
               >
                 <div
-                  className={`max-w-[85%] md:max-w-[80%] p-6 rounded-3xl relative backdrop-blur-md ${
+                  className={`max-w-[85%] md:max-w-[80%] p-6 md:p-8 rounded-[2rem] relative backdrop-blur-xl ${
                     msg.role === 'user'
-                      ? 'bg-white/5 border border-white/10 text-[var(--text-primary)] rounded-tr-none'
-                      : 'bg-black/40 border border-[var(--gold-border)] text-[var(--text-primary)] shadow-[0_10px_30px_rgba(0,0,0,0.5)] rounded-tl-none'
+                      ? 'bg-white/5 border border-white/5 text-[var(--text-primary)] rounded-tr-sm'
+                      : 'bg-black/30 border border-[var(--gold-border)] text-[var(--text-primary)] shadow-[0_10px_40px_rgba(0,0,0,0.5)] rounded-tl-sm'
                   }`}
                 >
                   {msg.role === 'sage' && (
-                    <div className="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-white/5 text-xs">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-6 h-6 rounded-full bg-[var(--gold-glow)] flex items-center justify-center text-[var(--gold-pure)] border border-[var(--gold-border)]">
-                           <SageAvatar tier={msg.tier} size={12} />
-                        </div>
-                        <span className="text-[var(--gold-pure)] font-bold font-serif flex items-center gap-1.5 tracking-wide">
-                          <Sparkles size={13} />
+                    <div className="flex items-center justify-between gap-4 mb-4 pb-4 border-b border-white/5 text-xs">
+                      <div className="flex items-center gap-3">
+                        <SageAvatar tier={msg.tier} size={28} />
+                        <span className="text-[var(--gold-pure)] font-bold font-serif flex items-center gap-2 tracking-wide">
                           {msg.tier === 'sovereign' ? 'الاستبصار السيادي' : msg.tier === 'analytical' ? 'التحليل المنطقي' : 'الحكمة الرواقية'}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
                         <button 
                           onClick={() => speak(msg.content, getSagePersona(msg.tier))}
-                          className="text-[var(--gold-pure)] hover:text-white transition-colors flex items-center gap-1.5"
-                          title="إستمع (Re-read)"
+                          className="text-[var(--gold-pure)]/70 hover:text-[var(--gold-pure)] transition-colors flex items-center gap-1.5 p-2 rounded-full hover:bg-[var(--gold-glow)]"
+                          title="إستمع"
                         >
-                          <Volume2 size={14} />
+                          <Volume2 size={16} strokeWidth={1.5} />
                         </button>
                       </div>
                     </div>
                   )}
-                  <p className="font-serif text-[15px] md:text-[17px] leading-[2.2] whitespace-pre-line text-[var(--text-primary)]">
+                  <p className="font-serif text-[15px] md:text-lg leading-[2.2] whitespace-pre-line text-[var(--text-primary)]">
                     {msg.content}
                   </p>
                   {msg.role === 'user' && (
-                    <div className="mt-3 text-left text-[10px] text-[var(--text-secondary)] font-sans">
+                    <div className="mt-4 text-left text-[10px] text-[var(--text-secondary)] font-sans">
                       {msg.timestamp}
                     </div>
                   )}
@@ -211,9 +223,9 @@ export default function SageChat() {
                 exit={{ opacity: 0, scale: 0.95 }}
                 className="flex justify-end w-full"
               >
-                <div className="p-4 px-6 rounded-full bg-black/40 border border-[var(--gold-border)] backdrop-blur-md shadow-[0_0_30px_rgba(212,175,55,0.1)] flex items-center gap-4">
-                  <div className="w-5 h-5 rounded-full border-[2px] border-[var(--gold-pure)] border-t-transparent animate-spin" />
-                  <span className="text-sm font-serif text-[var(--gold-pure)] animate-pulse tracking-wide">
+                <div className="p-4 px-6 rounded-full bg-black/30 border border-[var(--gold-border)] backdrop-blur-xl shadow-[0_0_30px_rgba(212,175,55,0.05)] flex items-center gap-4">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold-pure)] shadow-[0_0_8px_var(--gold-pure)] animate-pulse" />
+                  <span className="text-sm font-serif text-[var(--gold-pure)] tracking-wide opacity-80">
                     يتأمل...
                   </span>
                 </div>
@@ -226,50 +238,91 @@ export default function SageChat() {
 
       {/* Input Area (Absolute Bottom Center) */}
       <div className="fixed bottom-0 inset-x-0 p-4 md:p-8 pointer-events-none z-50">
-        <div className="max-w-3xl mx-auto relative pointer-events-auto">
-          <form onSubmit={handleSend} className="relative flex items-center bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] p-2 transition-all focus-within:border-[var(--gold-border)] focus-within:bg-black/40 group">
-            
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              disabled={isContemplating}
-              placeholder={isContemplating ? 'تريّث.. الحكيم يستحضر الجواب..' : 'اطرح معضلتك النفسية هنا...'}
-              className="flex-1 bg-transparent px-4 py-3 md:py-4 text-sm md:text-base text-white placeholder-[var(--text-secondary)] outline-none font-serif w-full"
-            />
-            
-            <div className="flex items-center gap-2 pr-2">
-              {/* Stealth Mic */}
-              <button
-                type="button"
-                onMouseDown={startRecording}
-                onMouseUp={stopRecording}
-                onTouchStart={startRecording}
-                onTouchEnd={stopRecording}
-                className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-                  isRecording
-                    ? 'opacity-100 bg-[var(--gold-glow)] text-[var(--gold-pure)] scale-110 shadow-[0_0_20px_rgba(212,175,55,0.5)]'
-                    : 'opacity-50 text-[var(--text-primary)] hover:opacity-100 hover:bg-white/5'
-                }`}
-                title="اضغط مطولاً للتسجيل"
-              >
-                <Mic size={20} strokeWidth={1.5} className={isRecording ? 'animate-pulse' : ''} />
-              </button>
+        
+        {/* Subtle Radial Glow */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-32 bg-[var(--gold-pure)] opacity-[0.03] blur-3xl pointer-events-none rounded-t-[100%]" />
 
-              <button
-                type="submit"
-                disabled={!input.trim() || isContemplating}
-                className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/5 flex items-center justify-center text-[var(--text-primary)] hover:bg-[var(--gold-pure)] hover:text-black hover:scale-105 disabled:opacity-30 disabled:hover:bg-white/5 disabled:hover:text-[var(--text-primary)] disabled:hover:scale-100 transition-all"
-                title="إرسال"
-              >
-                <Send size={18} className="rotate-180" strokeWidth={1.5} />
-              </button>
-            </div>
+        <div className="max-w-3xl mx-auto relative pointer-events-auto">
+          <form onSubmit={handleSend} className="relative flex items-center bg-black/40 backdrop-blur-2xl border border-white/10 rounded-full shadow-[0_20px_60px_rgba(0,0,0,0.6)] p-2 transition-all focus-within:border-[var(--gold-border)] group">
             
+            <AnimatePresence mode="wait">
+              {isRecording ? (
+                <motion.div 
+                  key="recording"
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: '100%' }}
+                  exit={{ opacity: 0, width: 0 }}
+                  className="flex items-center gap-4 px-4 w-full h-12"
+                >
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.6)] shrink-0" />
+                  <span className="text-sm font-serif text-white whitespace-nowrap">جارٍ الاستماع...</span>
+                  
+                  {/* Fake Audio Waveform */}
+                  <div className="flex-1 flex items-center gap-1 justify-center overflow-hidden opacity-50 px-4">
+                     {[...Array(15)].map((_, i) => (
+                       <motion.div
+                         key={i}
+                         animate={{ height: ['20%', '80%', '20%'] }}
+                         transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.05 }}
+                         className="w-1 bg-[var(--gold-pure)] rounded-full"
+                         style={{ height: '4px' }}
+                       />
+                     ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={stopRecording}
+                    className="w-10 h-10 shrink-0 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center hover:bg-red-500/20 transition-all"
+                  >
+                    <StopCircle size={20} strokeWidth={1.5} />
+                  </button>
+                </motion.div>
+              ) : (
+                <motion.div 
+                  key="input"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center w-full"
+                >
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    disabled={isContemplating}
+                    placeholder={isContemplating ? 'تريّث.. الحكيم يستحضر الجواب..' : 'اطرح معضلتك النفسية هنا...'}
+                    className="flex-1 bg-transparent px-6 py-3 md:py-4 text-sm md:text-base text-white placeholder-[var(--text-secondary)] outline-none font-serif w-full"
+                  />
+                  
+                  <div className="flex items-center gap-2 pr-2">
+                    {/* Stealth Mic */}
+                    <button
+                      type="button"
+                      onClick={startRecording}
+                      className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 opacity-50 text-[var(--text-primary)] hover:opacity-100 hover:bg-white/5"
+                      title="تحدث"
+                    >
+                      <Mic size={20} strokeWidth={1.5} />
+                    </button>
+
+                    <button
+                      type="submit"
+                      disabled={!input.trim() || isContemplating}
+                      className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/5 flex items-center justify-center text-[var(--text-primary)] hover:bg-[var(--gold-pure)] hover:text-black hover:scale-105 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[var(--text-primary)] disabled:hover:scale-100 transition-all"
+                      title="إرسال"
+                    >
+                      <Send size={18} className="rotate-180" strokeWidth={1.5} />
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </form>
-          <div className="text-center mt-3 hidden md:block">
-            <span className="text-[10px] text-[var(--text-secondary)] font-serif tracking-widest">
-              الحكمة ليست بديلاً عن العلاج المختص.
+          
+          <div className="text-center mt-4 hidden md:block">
+            <span className="text-[10px] text-[var(--text-secondary)] font-serif tracking-widest uppercase opacity-70">
+              Mind in Box — The Digital Sanctuary
             </span>
           </div>
         </div>

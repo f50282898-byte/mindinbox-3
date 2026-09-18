@@ -11,7 +11,6 @@ import {
   Brain,
   Mic,
   Check,
-  Sparkles,
   Shield,
   Star,
   Flame,
@@ -230,31 +229,13 @@ function FeatureCard({
   );
 }
 
-// Hook to create a realistic ever-growing user count based on math/time
-function useStrategicCounter(baseNumber: number) {
-  const [count, setCount] = useState(baseNumber);
-
-  useEffect(() => {
-    // Math logic based on current timestamp
-    // Base date to start incrementing from: Jan 1, 2026
-    const baseDate = new Date('2026-01-01T00:00:00Z').getTime();
-    const now = Date.now();
-    const elapsedHours = (now - baseDate) / (1000 * 60 * 60);
-    
-    // Add ~2 users per hour on average
-    const increment = Math.floor(elapsedHours * 2.14);
-    
-    setCount(baseNumber + increment);
-  }, [baseNumber]);
-
-  return count;
-}
+import { useStrategicCounter } from '@/hooks/useStrategicCounter';
 
 export default function Vault() {
   const { isPro } = useStore();
   const { setTheme } = useVideoTheme();
   const router = useRouter();
-  const userCount = useStrategicCounter(3450);
+  const userCount = useStrategicCounter(54);
   
   // Velvet Rope Modal State
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);

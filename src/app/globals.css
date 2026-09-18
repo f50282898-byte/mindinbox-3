@@ -62,7 +62,7 @@ html {
 body {
   background: var(--bg-void);
   color: var(--text-primary);
-  font-family: var(--font-tajawal), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-tajawal), sans-serif;
   -webkit-font-smoothing: antialiased;
   min-height: 100svh;
   overflow-x: hidden;
@@ -71,7 +71,7 @@ body {
 
 /* ── Typography ───────────────────────────────────── */
 .font-serif {
-  font-family: var(--font-playfair), var(--font-tajawal), Georgia, serif;
+  font-family: var(--font-tajawal), sans-serif;
 }
 .font-reem {
   font-family: var(--font-reem-kufi), sans-serif;

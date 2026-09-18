@@ -9,7 +9,6 @@ import {
   Italic, 
   Quote, 
   Heading1, 
-  Sparkles, 
   Download,
   Calendar,
   Layers,

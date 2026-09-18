@@ -24,6 +24,10 @@ interface AppState {
   setActiveBinaural: (track: string | null) => void;
   disciplineLog: Record<string, boolean>;
   toggleDiscipline: (key: string) => void;
+  isSidebarOpen: boolean;
+  toggleSidebar: () => void;
+  audioSpeed: number;
+  setAudioSpeed: (speed: number) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -61,4 +65,8 @@ export const useStore = create<AppState>((set) => ({
         [key]: !state.disciplineLog[key],
       },
     })),
+  isSidebarOpen: typeof window !== 'undefined' ? window.innerWidth > 768 : true,
+  toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
+  audioSpeed: 1,
+  setAudioSpeed: (speed: number) => set({ audioSpeed: speed }),
 }));
