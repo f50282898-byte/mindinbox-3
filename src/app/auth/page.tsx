@@ -118,6 +118,35 @@ export default function AuthPage() {
           )}
         </AnimatePresence>
 
+        <div className="flex bg-black/40 p-1 rounded-xl mb-6">
+          <button
+            onClick={() => {
+              setIsLogin(true);
+              setError('');
+            }}
+            className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${
+              isLogin 
+                ? 'bg-[#D4AF37] text-black shadow-[0_0_10px_rgba(212,175,55,0.3)]' 
+                : 'text-[#888888] hover:text-[#EAEAEA]'
+            }`}
+          >
+            تسجيل الدخول
+          </button>
+          <button
+            onClick={() => {
+              setIsLogin(false);
+              setError('');
+            }}
+            className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${
+              !isLogin 
+                ? 'bg-[#D4AF37] text-black shadow-[0_0_10px_rgba(212,175,55,0.3)]' 
+                : 'text-[#888888] hover:text-[#EAEAEA]'
+            }`}
+          >
+            حساب جديد
+          </button>
+        </div>
+
         <form onSubmit={handleEmailAuth} className="space-y-4">
           <div>
             <div className="relative flex items-center">
@@ -157,12 +186,12 @@ export default function AuthPage() {
             ) : isLogin ? (
               <>
                 <LogIn size={16} />
-                <span>ولوج</span>
+                <span>تسجيل الدخول</span>
               </>
             ) : (
               <>
                 <UserPlus size={16} />
-                <span>تأسيس</span>
+                <span>إنشاء الحساب</span>
               </>
             )}
           </button>
@@ -170,6 +199,7 @@ export default function AuthPage() {
 
         <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
           <button
+            type="button"
             onClick={handleGoogleAuth}
             disabled={isSubmitting}
             className="w-full py-3.5 rounded-xl bg-white/5 border border-white/10 text-[#EAEAEA] text-xs font-bold hover:bg-white/10 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
@@ -177,18 +207,6 @@ export default function AuthPage() {
             <Sparkles size={14} className="text-[#D4AF37]" />
             <span>المصادقة عبر Google</span>
           </button>
-
-          <div className="text-center">
-            <button
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setError('');
-              }}
-              className="text-xs text-[#888888] hover:text-[#D4AF37] transition-colors font-serif"
-            >
-              {isLogin ? 'ليس لديك ميثاق؟ أسس حساباً جديداً' : 'لديك ميثاق مسبق؟ عُد للولوج'}
-            </button>
-          </div>
         </div>
       </motion.div>
     </div>

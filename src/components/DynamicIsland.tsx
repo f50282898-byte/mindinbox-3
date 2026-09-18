@@ -21,10 +21,12 @@ import { usePathname } from 'next/navigation';
 import { useStore } from '@/store/useStore';
 import { db } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
+import { useAuth } from '@/context/AuthContext';
 
 export default function DynamicIsland() {
   const pathname = usePathname();
   const { user, isPro, setIsPro, setDisplayName } = useStore();
+  const { currentUser } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(user.displayName);
@@ -131,95 +133,107 @@ export default function DynamicIsland() {
           )}
         </div>
 
-        {/* Left side: User Profile Avatar with Firestore Edit dropdown */}
+        {/* Left side: User Profile Avatar with Firestore Edit dropdown OR Login Link */}
         <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 p-1.5 rounded-full bg-white/5 border border-white/10 hover:border-[#D4AF37]/40 transition-all text-[#888888] hover:text-[#EAEAEA]"
-          >
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#D4AF37]/20 to-black flex items-center justify-center border border-[#D4AF37]/30 text-[#D4AF37]">
-              <User size={14} />
-            </div>
-            <ChevronDown size={12} className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-          </button>
-
-          <AnimatePresence>
-            {isDropdownOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                className="absolute left-0 mt-3 w-64 rounded-2xl bg-[#0A0A0A]/95 backdrop-blur-2xl border border-[#D4AF37]/25 shadow-[0_20px_50px_rgba(0,0,0,0.9)] p-4 z-50 text-right font-sans"
+          {!currentUser ? (
+            <Link
+              href="/auth"
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-[#D4AF37]/40 transition-all text-[#EAEAEA] text-xs font-serif shadow-sm hover:shadow-[0_0_15px_rgba(212,175,55,0.2)]"
+            >
+              <User size={14} className="text-[#D4AF37]" />
+              <span>ولوج / تأسيس ميثاق</span>
+            </Link>
+          ) : (
+            <>
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center gap-2 p-1.5 rounded-full bg-white/5 border border-white/10 hover:border-[#D4AF37]/40 transition-all text-[#888888] hover:text-[#EAEAEA]"
               >
-                <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
-                      <User size={16} />
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold text-[#EAEAEA]">{user.displayName}</p>
-                      <p className="text-[10px] text-[#888888]">{user.email}</p>
-                    </div>
-                  </div>
-                  {isPro ? (
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30">
-                      سيادي
-                    </span>
-                  ) : (
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-[#888888]">
-                      مجاني
-                    </span>
-                  )}
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#D4AF37]/20 to-black flex items-center justify-center border border-[#D4AF37]/30 text-[#D4AF37]">
+                  <User size={14} />
                 </div>
+                <ChevronDown size={12} className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
 
-                {/* Edit Name in Firestore */}
-                <div className="space-y-2 mb-3">
-                  <label className="text-[10px] uppercase tracking-wider text-[#D4AF37]/80 block">
-                    تعديل الهوية والاسم (مزامنة سحابية)
-                  </label>
-                  {editingName ? (
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={nameInput}
-                        onChange={(e) => setNameInput(e.target.value)}
-                        className="w-full px-2.5 py-1.5 rounded-lg bg-black border border-[#D4AF37]/30 text-xs text-[#EAEAEA] focus:outline-none focus:border-[#D4AF37]"
-                        placeholder="الاسم الجديد..."
-                      />
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute left-0 mt-3 w-64 rounded-2xl bg-[#0A0A0A]/95 backdrop-blur-2xl border border-[#D4AF37]/25 shadow-[0_20px_50px_rgba(0,0,0,0.9)] p-4 z-50 text-right font-sans"
+                  >
+                    <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
+                          <User size={16} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-[#EAEAEA]">{currentUser.displayName || user.displayName}</p>
+                          <p className="text-[10px] text-[#888888]">{currentUser.email}</p>
+                        </div>
+                      </div>
+                      {isPro ? (
+                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30">
+                          سيادي
+                        </span>
+                      ) : (
+                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-[#888888]">
+                          مجاني
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Edit Name in Firestore */}
+                    <div className="space-y-2 mb-3">
+                      <label className="text-[10px] uppercase tracking-wider text-[#D4AF37]/80 block">
+                        تعديل الهوية والاسم (مزامنة سحابية)
+                      </label>
+                      {editingName ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={nameInput}
+                            onChange={(e) => setNameInput(e.target.value)}
+                            className="w-full px-2.5 py-1.5 rounded-lg bg-black border border-[#D4AF37]/30 text-xs text-[#EAEAEA] focus:outline-none focus:border-[#D4AF37]"
+                            placeholder="الاسم الجديد..."
+                          />
+                          <button
+                            onClick={handleSaveName}
+                            disabled={savingFirestore}
+                            className="p-1.5 rounded-lg bg-[#D4AF37] text-black hover:bg-[#AA7C11] transition-colors"
+                            title="حفظ"
+                          >
+                            <Check size={14} />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setEditingName(true)}
+                          className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 text-xs text-[#EAEAEA] transition-colors"
+                        >
+                          <span>{currentUser.displayName || user.displayName}</span>
+                          <Edit2 size={12} className="text-[#D4AF37]" />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Dev Toggle Pro */}
+                    <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                      <span className="text-[10px] text-[#888888]">حالة العضوية:</span>
                       <button
-                        onClick={handleSaveName}
-                        disabled={savingFirestore}
-                        className="p-1.5 rounded-lg bg-[#D4AF37] text-black hover:bg-[#AA7C11] transition-colors"
-                        title="حفظ"
+                        onClick={() => setIsPro(!isPro)}
+                        className="text-[10px] text-[#D4AF37] hover:underline"
                       >
-                        <Check size={14} />
+                        {isPro ? 'تحويل إلى مجاني' : 'تفعيل العهد السيادي (تجريبي)'}
                       </button>
                     </div>
-                  ) : (
-                    <button
-                      onClick={() => setEditingName(true)}
-                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 text-xs text-[#EAEAEA] transition-colors"
-                    >
-                      <span>{user.displayName}</span>
-                      <Edit2 size={12} className="text-[#D4AF37]" />
-                    </button>
-                  )}
-                </div>
-
-                {/* Dev Toggle Pro */}
-                <div className="pt-2 border-t border-white/5 flex items-center justify-between">
-                  <span className="text-[10px] text-[#888888]">حالة العضوية:</span>
-                  <button
-                    onClick={() => setIsPro(!isPro)}
-                    className="text-[10px] text-[#D4AF37] hover:underline"
-                  >
-                    {isPro ? 'تحويل إلى مجاني' : 'تفعيل العهد السيادي (تجريبي)'}
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
         </div>
       </motion.nav>
     </header>
