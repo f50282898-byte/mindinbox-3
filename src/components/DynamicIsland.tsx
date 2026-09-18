@@ -4,9 +4,9 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles, Compass, Landmark, Feather, Users,
-  KeyRound, Check, Edit2, Crown, ChevronDown,
+  Check, Edit2, Crown, ChevronDown,
   LogOut, User, Lock, Zap, Brain, Mic, FileText,
-  TrendingUp, X
+  X
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -16,11 +16,13 @@ import { doc, setDoc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { useAuth } from '@/context/AuthContext';
 
+const COMMUNITY_MEMBER_COUNT = 34;
+
 /* ─── FOMO trigger content — contextual per page & action ─────────── */
 const FOMO_TRIGGERS: Record<string, { headline: string; body: string; icon: React.ElementType }> = {
   '/secret-council': {
     headline: 'المجلس السري مقفل',
-    body: 'أعضاء العهد السيادي يتداولون الآن في أفكار لا تُقاس. انضم إلى 847 عقلاً مختاراً.',
+    body: `أعضاء العهد السيادي يتداولون الآن في أفكار لا تُقاس. انضم إلى ${COMMUNITY_MEMBER_COUNT} عقلاً مختاراً.`,
     icon: Users,
   },
   '/utopian-city': {
@@ -35,7 +37,7 @@ const FOMO_TRIGGERS: Record<string, { headline: string; body: string; icon: Reac
   },
   default: {
     headline: 'أنت على بُعد خطوة واحدة',
-    body: 'العهد السيادي يمنحك تقريراً نفسياً شهرياً عن تطور عقلك. 847 عضو. مقاعد محدودة.',
+    body: `العهد السيادي يمنحك تقريراً نفسياً شهرياً عن تطور عقلك. ${COMMUNITY_MEMBER_COUNT} عضو فقط. مقاعد محدودة.`,
     icon: Crown,
   },
 };
@@ -55,7 +57,7 @@ const NAV_LINKS: NavLink[] = [
   { href: '/journal', label: 'محراب التفريغ', icon: Feather },
   {
     href: '/secret-council', label: 'المجلس السري', icon: Users,
-    proOnly: true, proHint: '٨٤٧ عضو نشط الآن'
+    proOnly: true, proHint: `${COMMUNITY_MEMBER_COUNT} عضو نشط الآن`
   },
 ];
 
@@ -101,11 +103,6 @@ export default function DynamicIsland() {
       if (fomoTimerRef.current) clearTimeout(fomoTimerRef.current);
     };
   }, [isPro, fomoShown]);
-
-  /* Reset FOMO trigger on page change (contextual trigger) */
-  useEffect(() => {
-    setPanel('none');
-  }, [pathname]);
 
   const currentFomo = FOMO_TRIGGERS[pathname] ?? FOMO_TRIGGERS['default'];
   const FomoIcon = currentFomo.icon;
@@ -228,7 +225,7 @@ export default function DynamicIsland() {
               </span>
             ) : (
               <button
-                onClick={() => togglePanel('fomo')}
+                onClick={() => router.push('/vault/checkout')}
                 className="relative px-3 py-1.5 rounded-full text-[10px] font-bold gold-gradient text-black flex items-center gap-1 hover:brightness-110 transition-all shrink-0 shadow-[0_0_12px_rgba(212,175,55,0.3)]"
               >
                 <Crown size={12} />
@@ -453,13 +450,13 @@ export default function DynamicIsland() {
                     ))}
                   </div>
                   <p className="text-[9px] text-[var(--text-secondary)] leading-tight">
-                    <span className="font-bold text-[var(--gold-pure)]">847</span> عضو سيادي يفكّر الآن بعمق أكثر منك
+                    <span className="font-bold text-[var(--gold-pure)]">{COMMUNITY_MEMBER_COUNT}</span> عضو سيادي يفكّر الآن بعمق أكثر منك
                   </p>
                 </div>
 
                 {/* CTA */}
                 <Link
-                  href="/vault"
+                  href="/vault/checkout"
                   onClick={() => setPanel('none')}
                   className="flex items-center justify-center gap-2 w-full py-3 rounded-xl gold-gradient text-black font-bold text-sm hover:brightness-110 transition-all shadow-[0_0_24px_rgba(212,175,55,0.3)] hover:shadow-[0_0_36px_rgba(212,175,55,0.5)]"
                 >

@@ -1,6 +1,7 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import {
   Crown,
@@ -10,18 +11,13 @@ import {
   Brain,
   Mic,
   Check,
-  X,
-  Phone,
   Sparkles,
   Shield,
   Star,
 } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { useVideoTheme } from '@/components/VideoBackground';
-import { db } from '@/firebase';
-import { doc, setDoc } from 'firebase/firestore';
 
-/* ─── Framer-motion variants ─── */
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
   visible: (i: number = 0) => ({
@@ -40,7 +36,6 @@ const scaleIn: Variants = {
   },
 };
 
-/* ─── Static data ─── */
 const STORY_PANELS = [
   {
     label: 'قبل',
@@ -89,7 +84,7 @@ const PRO_FEATURES = [
   {
     key: 'council',
     title: 'المجلس السري ٢٤/٧',
-    desc: 'محادثات AI بذاكرة دائمة وغير محدودة. ٨٤٧ عضو نشط الآن.',
+    desc: 'محادثات AI بذاكرة دائمة وغير محدودة. ٣٤ عضو نشط الآن.',
     Icon: Users,
   },
   {
@@ -116,31 +111,51 @@ const PERKS = [
 
 const AVATARS = ['ع', 'خ', 'ب', 'ف'];
 
-/* ─── Gold dot confetti for Pro state ─── */
+const GOLD_DOTS = [
+  { left: '8%', top: '14%', width: 5, height: 5, y: -32, duration: 2.1, delay: 0.2 },
+  { left: '18%', top: '38%', width: 7, height: 7, y: -46, duration: 2.8, delay: 1.1 },
+  { left: '30%', top: '22%', width: 6, height: 6, y: -40, duration: 2.4, delay: 0.7 },
+  { left: '42%', top: '58%', width: 8, height: 8, y: -54, duration: 2.9, delay: 1.4 },
+  { left: '52%', top: '30%', width: 5, height: 5, y: -28, duration: 2.2, delay: 0.5 },
+  { left: '60%', top: '62%', width: 7, height: 7, y: -50, duration: 3.1, delay: 1.9 },
+  { left: '72%', top: '18%', width: 6, height: 6, y: -36, duration: 2.3, delay: 0.8 },
+  { left: '80%', top: '52%', width: 9, height: 9, y: -58, duration: 2.7, delay: 1.6 },
+  { left: '90%', top: '36%', width: 5, height: 5, y: -30, duration: 2.5, delay: 1.2 },
+  { left: '12%', top: '76%', width: 6, height: 6, y: -44, duration: 2.6, delay: 0.9 },
+  { left: '26%', top: '84%', width: 8, height: 8, y: -52, duration: 3.2, delay: 1.7 },
+  { left: '63%', top: '82%', width: 7, height: 7, y: -48, duration: 2.4, delay: 1.1 },
+  { left: '88%', top: '76%', width: 6, height: 6, y: -38, duration: 2.3, delay: 0.4 },
+  { left: '48%', top: '88%', width: 5, height: 5, y: -26, duration: 2.1, delay: 1.8 },
+  { left: '68%', top: '12%', width: 7, height: 7, y: -42, duration: 2.9, delay: 0.3 },
+  { left: '34%', top: '68%', width: 4, height: 4, y: -24, duration: 2.0, delay: 1.5 },
+  { left: '54%', top: '52%', width: 5, height: 5, y: -30, duration: 2.6, delay: 0.6 },
+  { left: '76%', top: '66%', width: 5, height: 5, y: -32, duration: 2.4, delay: 1.3 },
+] as const;
+
 function GoldDots() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
-      {Array.from({ length: 18 }).map((_, i) => (
+      {GOLD_DOTS.map((dot, i) => (
         <motion.div
           key={i}
           className="absolute rounded-full"
           style={{
-            width: Math.random() * 6 + 3,
-            height: Math.random() * 6 + 3,
+            width: dot.width,
+            height: dot.height,
             background: 'var(--gold-pure)',
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: dot.left,
+            top: dot.top,
           }}
           initial={{ opacity: 0, scale: 0 }}
           animate={{
             opacity: [0, 0.9, 0],
             scale: [0, 1.4, 0],
-            y: [0, -(Math.random() * 60 + 30)],
+            y: [0, -dot.y],
           }}
           transition={{
-            duration: Math.random() * 2 + 1.5,
+            duration: dot.duration,
             repeat: Infinity,
-            repeatDelay: Math.random() * 3,
+            repeatDelay: dot.delay,
             ease: 'easeOut',
           }}
         />
@@ -149,7 +164,6 @@ function GoldDots() {
   );
 }
 
-/* ─── Feature lock/unlock card ─── */
 function FeatureCard({
   title,
   desc,
@@ -180,7 +194,6 @@ function FeatureCard({
         transition: 'box-shadow 0.4s ease',
       }}
     >
-      {/* Gold glow expand on hover */}
       <motion.div
         className="absolute inset-0 rounded-2xl pointer-events-none"
         animate={{
@@ -192,7 +205,6 @@ function FeatureCard({
         transition={{ duration: 0.35 }}
       />
 
-      {/* Lock / Unlock icon */}
       <div className="relative w-12 h-12 mb-4 flex items-center justify-center">
         <AnimatePresence mode="wait">
           {hovered ? (
@@ -221,7 +233,6 @@ function FeatureCard({
         </AnimatePresence>
       </div>
 
-      {/* Feature icon */}
       <div className="flex items-center gap-2 mb-3">
         <Icon size={16} className="text-[var(--gold-muted)]" />
         <h3 className="font-serif text-base font-bold text-[var(--text-primary)]">{title}</h3>
@@ -231,68 +242,19 @@ function FeatureCard({
   );
 }
 
-/* ═══════════════════════════════
-   MAIN COMPONENT
-═══════════════════════════════ */
 export default function Vault() {
-  const { user, isPro, setIsPro, setPhone } = useStore();
+  const { isPro } = useStore();
   const { setTheme } = useVideoTheme();
+  const router = useRouter();
 
-  const [showModal, setShowModal] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState(user.phone ?? '');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
-
-  /* Video background */
   useEffect(() => {
     setTheme({ src: '/videos/vault.mp4', overlayOpacity: 0.6 });
     return () => setTheme({});
   }, [setTheme]);
 
-  /* Seal the covenant handler */
-  const handleSealCovenant = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!phoneNumber.trim()) return;
-    setIsSubmitting(true);
-    try {
-      setPhone(phoneNumber.trim());
-      setIsPro(true);
-      await setDoc(
-        doc(db, 'users', user.uid),
-        {
-          phone: phoneNumber.trim(),
-          isPro: true,
-          covenantSealedAt: new Date().toISOString(),
-          tier: 'sovereign_pro',
-        },
-        { merge: true }
-      );
-      if (typeof window !== 'undefined' && window.navigator?.vibrate) {
-        window.navigator.vibrate([40, 80, 40]);
-      }
-      setSuccess(true);
-      setTimeout(() => {
-        setShowModal(false);
-        setSuccess(false);
-      }, 2400);
-    } catch (err) {
-      console.warn('Firestore fallback — covenant sealed locally:', err);
-      setIsPro(true);
-      setSuccess(true);
-      setTimeout(() => {
-        setShowModal(false);
-        setSuccess(false);
-      }, 2400);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  /* ── PRO STATE ── */
   if (isPro) {
     return (
       <div className="w-full fade-in-up pb-32 max-w-4xl mx-auto px-4" dir="rtl">
-        {/* Pro hero */}
         <motion.div
           variants={scaleIn}
           initial="hidden"
@@ -300,7 +262,6 @@ export default function Vault() {
           className="glass-gold rounded-3xl p-10 md:p-14 text-center relative overflow-hidden mb-10"
         >
           <GoldDots />
-          {/* Top shimmer line */}
           <div className="absolute top-0 inset-x-0 h-px shimmer" />
 
           <motion.div
@@ -324,7 +285,6 @@ export default function Vault() {
             عضويتك السيادية مفعّلة — انتفع بكامل امتيازات المجلس.
           </p>
 
-          {/* Active feature unlocks */}
           <div className="space-y-3 text-right max-w-md mx-auto mb-8">
             {PRO_FEATURES.map(({ key, title, Icon }) => (
               <motion.div
@@ -338,15 +298,14 @@ export default function Vault() {
                   border: '1px solid rgba(212,175,55,0.15)',
                 }}
               >
-                <Unlock size={16} className="text-[var(--gold-pure)] flex-shrink-0" />
-                <Icon size={16} className="text-[var(--gold-muted)] flex-shrink-0" />
+                <Unlock size={16} className="text-[var(--gold-pure)] shrink-0" />
+                <Icon size={16} className="text-[var(--gold-muted)] shrink-0" />
                 <span className="text-sm font-serif text-[var(--text-primary)]">{title}</span>
               </motion.div>
             ))}
           </div>
         </motion.div>
 
-        {/* Manage covenant */}
         <motion.div
           variants={fadeUp}
           custom={1}
@@ -361,7 +320,7 @@ export default function Vault() {
             يمكنك تحديث بيانات تواصلك أو الاطلاع على تفاصيل عضويتك السيادية.
           </p>
           <button
-            onClick={() => setShowModal(true)}
+            onClick={() => router.push('/vault/checkout')}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm text-black transition-all hover:brightness-110"
             style={{
               background: 'linear-gradient(135deg, #AA7C11, #D4AF37)',
@@ -372,29 +331,13 @@ export default function Vault() {
             <span>إدارة الميثاق</span>
           </button>
         </motion.div>
-
-        {/* Modal reuse */}
-        <CovenantModal
-          show={showModal}
-          onClose={() => setShowModal(false)}
-          phoneNumber={phoneNumber}
-          setPhoneNumber={setPhoneNumber}
-          onSubmit={handleSealCovenant}
-          isSubmitting={isSubmitting}
-          success={success}
-          isPro={isPro}
-        />
       </div>
     );
   }
 
-  /* ── FREE STATE ── */
   return (
     <div className="w-full fade-in-up pb-32" dir="rtl">
-
-      {/* ── A. HERO ─────────────────────────────────── */}
       <section className="relative text-center px-4 pt-10 pb-16 max-w-3xl mx-auto">
-        {/* Pulsing crown */}
         <motion.div
           initial={{ opacity: 0, scale: 0.6 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -429,7 +372,6 @@ export default function Vault() {
           لست هنا لتشتري اشتراكاً. أنت هنا لتوقّع ميثاقاً مع نفسك.
         </motion.p>
 
-        {/* Social proof */}
         <motion.div
           variants={fadeUp}
           custom={2}
@@ -456,12 +398,11 @@ export default function Vault() {
             ))}
           </div>
           <span className="text-sm font-serif text-[var(--gold-pure)]">
-            انضم إلى ٨٤٧ عقلاً سيادياً
+            انضم إلى ٣٤ عقلاً سيادياً
           </span>
         </motion.div>
       </section>
 
-      {/* ── B. TRANSFORMATION STORY ──────────────────── */}
       <section className="px-4 max-w-6xl mx-auto mb-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {STORY_PANELS.map((panel, i) => (
@@ -495,7 +436,7 @@ export default function Vault() {
                 {panel.lines.map((line, j) => (
                   <li key={j} className="flex items-start gap-2 text-sm font-serif text-[var(--text-secondary)]">
                     <span
-                      className="mt-1 w-1.5 h-1.5 rounded-full flex-shrink-0"
+                      className="mt-1 w-1.5 h-1.5 rounded-full shrink-0"
                       style={{ background: panel.accent }}
                     />
                     {line}
@@ -507,7 +448,6 @@ export default function Vault() {
         </div>
       </section>
 
-      {/* ── C. FEATURE LOCK→UNLOCK CARDS ─────────────── */}
       <section className="px-4 max-w-5xl mx-auto mb-20">
         <motion.h2
           variants={fadeUp}
@@ -532,7 +472,6 @@ export default function Vault() {
         </div>
       </section>
 
-      {/* ── D. PRICING CARD ──────────────────────────── */}
       <section className="px-4 max-w-xl mx-auto mb-20">
         <motion.div
           variants={scaleIn}
@@ -542,10 +481,8 @@ export default function Vault() {
           className="glass-gold rounded-3xl p-8 md:p-12 relative overflow-hidden"
           style={{ boxShadow: '0 30px 80px rgba(0,0,0,0.7)' }}
         >
-          {/* Top shimmer line */}
           <div className="absolute top-0 inset-x-0 h-px shimmer" />
 
-          {/* Badge */}
           <div className="flex items-center gap-2 mb-6">
             <Star size={14} className="text-[var(--gold-pure)]" />
             <span className="text-xs uppercase tracking-widest text-[var(--gold-pure)] font-semibold">
@@ -553,7 +490,6 @@ export default function Vault() {
             </span>
           </div>
 
-          {/* Price */}
           <div className="mb-2">
             <span className="font-serif text-6xl md:text-7xl font-bold gold-gradient-text">
               $19.99
@@ -565,7 +501,6 @@ export default function Vault() {
             (وفّر ١٧٪)
           </p>
 
-          {/* Equivalence framing */}
           <div
             className="rounded-xl p-4 mb-8 text-sm font-serif text-[var(--text-secondary)] leading-relaxed"
             style={{
@@ -574,11 +509,10 @@ export default function Vault() {
             }}
           >
             خدمة التوجيه التنفيذي الفردي تُقدَّر بـ{' '}
-            <span className="text-[var(--gold-pure)] font-bold">\$5,000 شهرياً</span>. هذا هو
+            <span className="text-[var(--gold-pure)] font-bold">$5,000 شهرياً</span>. هذا هو
             سعرها لأصحاب العقول الجادة.
           </div>
 
-          {/* Perks list */}
           <div className="space-y-3 mb-10 border-t border-b py-7" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
             {PERKS.map((perk, i) => (
               <motion.div
@@ -590,7 +524,7 @@ export default function Vault() {
                 className="flex items-center gap-3"
               >
                 <div
-                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                  className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
                   style={{
                     background: 'rgba(212,175,55,0.15)',
                     border: '1px solid rgba(212,175,55,0.4)',
@@ -603,11 +537,10 @@ export default function Vault() {
             ))}
           </div>
 
-          {/* CTA */}
           <motion.button
             whileHover={{ scale: 1.02, filter: 'brightness(1.12)' }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setShowModal(true)}
+            onClick={() => router.push('/vault/checkout')}
             className="w-full py-4 px-6 rounded-2xl font-bold text-sm tracking-widest uppercase flex items-center justify-center gap-2 group text-black transition-all"
             style={{
               background: 'linear-gradient(135deg, #AA7C11 0%, #D4AF37 50%, #E8CC6A 100%)',
@@ -618,225 +551,11 @@ export default function Vault() {
             <span>ختم الميثاق — $19.99 / شهر</span>
           </motion.button>
 
-          {/* Trust signals */}
           <p className="text-center text-xs text-[var(--text-muted)] mt-5 font-serif tracking-wide">
             إلغاء فوري · تشفير بنكي · بدون تعهدات
           </p>
         </motion.div>
       </section>
-
-      {/* ── MODAL ──────────────────────────────────── */}
-      <CovenantModal
-        show={showModal}
-        onClose={() => setShowModal(false)}
-        phoneNumber={phoneNumber}
-        setPhoneNumber={setPhoneNumber}
-        onSubmit={handleSealCovenant}
-        isSubmitting={isSubmitting}
-        success={success}
-        isPro={isPro}
-      />
     </div>
-  );
-}
-
-/* ─── COVENANT MODAL ─────────────────────────────── */
-interface CovenantModalProps {
-  show: boolean;
-  onClose: () => void;
-  phoneNumber: string;
-  setPhoneNumber: (v: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  isSubmitting: boolean;
-  success: boolean;
-  isPro: boolean;
-}
-
-function CovenantModal({
-  show,
-  onClose,
-  phoneNumber,
-  setPhoneNumber,
-  onSubmit,
-  isSubmitting,
-  success,
-  isPro,
-}: CovenantModalProps) {
-  return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-          style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(16px)' }}
-          onClick={(e) => e.target === e.currentTarget && onClose()}
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-lg rounded-3xl p-8 relative overflow-hidden"
-            style={{
-              background: 'rgba(8,8,8,0.97)',
-              border: '1px solid rgba(212,175,55,0.3)',
-              boxShadow: '0 40px 100px rgba(0,0,0,0.95)',
-            }}
-          >
-            {/* Shimmer top line */}
-            <div className="absolute top-0 inset-x-0 h-px shimmer" />
-
-            {/* Close button */}
-            <button
-              onClick={onClose}
-              className="absolute top-5 left-5 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-              aria-label="إغلاق"
-            >
-              <X size={20} />
-            </button>
-
-            {/* Modal header */}
-            <div className="flex items-center gap-3 mb-6">
-              <div
-                className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{
-                  background: 'rgba(212,175,55,0.15)',
-                  border: '1px solid rgba(212,175,55,0.35)',
-                }}
-              >
-                <Crown size={20} className="text-[var(--gold-pure)]" />
-              </div>
-              <div>
-                <h3 className="font-serif text-xl font-bold text-[var(--text-primary)]">
-                  أنت على وشك التحوّل
-                </h3>
-                <p className="text-xs text-[var(--text-secondary)] font-serif mt-0.5">
-                  {isPro ? 'تحديث بيانات الميثاق' : 'خطوة واحدة تفصلك عن السيادة'}
-                </p>
-              </div>
-            </div>
-
-            <AnimatePresence mode="wait">
-              {success ? (
-                /* Success state */
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="p-8 rounded-2xl text-center relative overflow-hidden"
-                  style={{
-                    background: 'rgba(212,175,55,0.1)',
-                    border: '1px solid rgba(212,175,55,0.35)',
-                    boxShadow: '0 0 60px rgba(212,175,55,0.15)',
-                  }}
-                >
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
-                    className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4"
-                    style={{ background: 'linear-gradient(135deg, #D4AF37, #A8892C)' }}
-                  >
-                    <Check size={26} className="text-black" />
-                  </motion.div>
-                  <h4 className="font-serif text-xl font-bold text-[var(--text-primary)] mb-2">
-                    انضم إلى النخبة. مرحباً بالسيادي.
-                  </h4>
-                  <p className="text-sm text-[var(--gold-pure)] font-serif">
-                    تم ختم ميثاقك وتفعيل رتبتك السيادية.
-                  </p>
-                </motion.div>
-              ) : (
-                /* Form state */
-                <motion.form
-                  key="form"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onSubmit={onSubmit}
-                  className="space-y-5"
-                >
-                  {/* Phone input */}
-                  <div>
-                    <label className="block text-xs font-serif text-[var(--gold-pure)] mb-2">
-                      رقم الهاتف (للتوثيق وربط العضوية):
-                    </label>
-                    <div className="relative flex items-center">
-                      <input
-                        type="tel"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        placeholder="+966 5X XXX XXXX"
-                        required
-                        dir="ltr"
-                        className="w-full px-4 py-3 pl-10 rounded-xl text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none transition-colors font-mono"
-                        style={{
-                          background: 'rgba(0,0,0,0.6)',
-                          border: '1px solid rgba(255,255,255,0.12)',
-                        }}
-                        onFocus={(e) =>
-                          (e.currentTarget.style.borderColor = 'rgba(212,175,55,0.5)')
-                        }
-                        onBlur={(e) =>
-                          (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')
-                        }
-                      />
-                      <Phone
-                        size={16}
-                        className="absolute left-3 text-[var(--text-muted)] pointer-events-none"
-                      />
-                    </div>
-                    <span className="text-[10px] text-[var(--text-muted)] mt-1.5 block font-serif">
-                      يُحفظ مشفراً في:{' '}
-                      <code className="text-[var(--gold-muted)]">users/{'{uid}'}/phone</code>
-                    </span>
-                  </div>
-
-                  {/* Covenant oath */}
-                  <div
-                    className="p-4 rounded-xl text-xs text-[var(--text-secondary)] font-serif leading-loose italic"
-                    style={{
-                      background: 'rgba(255,255,255,0.02)',
-                      border: '1px solid rgba(255,255,255,0.05)',
-                    }}
-                  >
-                    «أقرّ بالالتزام بمسار الانضباط الفكري، وحفظ أسرار المجلس السري، وصيانة حصانتي
-                    الذاتية أمام تقلبات الزمان. أختم هذا العهد بنيّة حرّة وإرادة سيادية.»
-                  </div>
-
-                  {/* Submit */}
-                  <motion.button
-                    whileHover={{ scale: 1.02, filter: 'brightness(1.1)' }}
-                    whileTap={{ scale: 0.98 }}
-                    type="submit"
-                    disabled={isSubmitting || !phoneNumber.trim()}
-                    className="w-full py-4 rounded-xl font-bold text-sm uppercase tracking-widest text-black transition-all disabled:opacity-40"
-                    style={{
-                      background: 'linear-gradient(135deg, #AA7C11, #D4AF37)',
-                      boxShadow: '0 0 30px rgba(212,175,55,0.3)',
-                    }}
-                  >
-                    {isSubmitting
-                      ? 'جارٍ ختم الميثاق في السجل...'
-                      : isPro
-                      ? 'تحديث بيانات الميثاق'
-                      : 'ختم الميثاق — $19.99 / شهر'}
-                  </motion.button>
-
-                  <p className="text-center text-[10px] text-[var(--text-muted)] font-serif">
-                    إلغاء فوري · تشفير بنكي · بدون تعهدات
-                  </p>
-                </motion.form>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
   );
 }
