@@ -1,40 +1,163 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════
+   MIND IN BOX — LOW-FOG GLASSMORPHISM DESIGN SYSTEM
+   ═══════════════════════════════════════════════════ */
+
 :root {
-  --background: #040404;
-  --foreground: #eaeaea;
+  /* Core palette */
+  --bg-void:        #020202;
+  --bg-surface:     #080808;
+  --bg-elevated:    #0d0d0d;
+
+  /* Gold spectrum */
+  --gold-pure:      #D4AF37;
+  --gold-muted:     #A8892C;
+  --gold-dim:       #6B5720;
+  --gold-glow:      rgba(212, 175, 55, 0.15);
+  --gold-border:    rgba(212, 175, 55, 0.18);
+
+  /* Text hierarchy */
+  --text-primary:   #F0EDE8;
+  --text-secondary: #9A948A;
+  --text-muted:     #4A4540;
+
+  /* Glass system */
+  --glass-bg:       rgba(8, 8, 8, 0.72);
+  --glass-border:   rgba(255, 255, 255, 0.07);
+  --glass-hover:    rgba(255, 255, 255, 0.04);
+  --glass-blur:     4px;   /* Low-Fog: user sees video clearly */
+}
+
+/* ── Base ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: #040404;
-  color: #eaeaea;
-  font-family: var(--font-tajawal), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--font-tajawal), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100svh;
+  overflow-x: hidden;
 }
 
+/* ── Typography ───────────────────────────────────── */
 .font-serif {
-  font-family: var(--font-playfair), var(--font-tajawal), serif;
+  font-family: var(--font-playfair), var(--font-tajawal), Georgia, serif;
+}
+
+/* ── Low-Fog Glass Components ─────────────────────── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-gold {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--gold-border);
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.06) inset;
+}
+
+.glass-card {
+  background: rgba(10, 10, 10, 0.68);
+  backdrop-filter: blur(6px) saturate(150%);
+  -webkit-backdrop-filter: blur(6px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-top-color: rgba(255, 255, 255, 0.1);
+  border-left-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Gold Glow Effects ────────────────────────────── */
+.glow-gold {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.2),
+              0 0 60px rgba(212, 175, 55, 0.08);
+}
+
+.glow-gold-text {
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, #D4AF37 0%, #A8892C 50%, #D4AF37 100%);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #E8CC6A 0%, #D4AF37 40%, #A8892C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Animations ───────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-.fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes pulseGold {
+  0%, 100% { opacity: 0.6; box-shadow: 0 0 6px rgba(212,175,55,0.4); }
+  50%       { opacity: 1;   box-shadow: 0 0 14px rgba(212,175,55,0.8); }
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
 }
 
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+@keyframes unlockPulse {
+  0%   { transform: scale(1);    opacity: 0.7; }
+  50%  { transform: scale(1.08); opacity: 1;   }
+  100% { transform: scale(1);    opacity: 0.7; }
+}
+
+@keyframes videoReveal {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.fade-in      { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.fade-in-up   { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.pulse-gold   { animation: pulseGold 2.5s ease-in-out infinite; }
+.unlock-pulse { animation: unlockPulse 2s ease-in-out infinite; }
+
+.shimmer {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(212,175,55,0.15) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite;
+}
+
+/* ── Utility ──────────────────────────────────────── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+.noise-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.028;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* ── Selection ────────────────────────────────────── */
+::selection {
+  background: rgba(212, 175, 55, 0.25);
+  color: #F0EDE8;
 }
