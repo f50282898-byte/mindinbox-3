@@ -14,13 +14,15 @@ import {
   Check, 
   Edit2, 
   Crown,
-  ChevronDown
+  ChevronDown,
+  LogOut
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useStore } from '@/store/useStore';
-import { db } from '@/firebase';
+import { db, auth } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 import { useAuth } from '@/context/AuthContext';
 
 export default function DynamicIsland() {
@@ -220,13 +222,29 @@ export default function DynamicIsland() {
                     </div>
 
                     {/* Dev Toggle Pro */}
-                    <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                    <div className="pt-2 pb-2 border-t border-white/5 flex items-center justify-between">
                       <span className="text-[10px] text-[#888888]">حالة العضوية:</span>
                       <button
                         onClick={() => setIsPro(!isPro)}
                         className="text-[10px] text-[#D4AF37] hover:underline"
                       >
                         {isPro ? 'تحويل إلى مجاني' : 'تفعيل العهد السيادي (تجريبي)'}
+                      </button>
+                    </div>
+
+                    {/* Sign Out Button */}
+                    <div className="pt-2 border-t border-white/5">
+                      <button
+                        onClick={async () => {
+                          if (auth) {
+                            await signOut(auth);
+                            setIsDropdownOpen(false);
+                          }
+                        }}
+                        className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-900/20 hover:bg-red-900/40 border border-red-500/20 text-xs text-red-400 transition-colors"
+                      >
+                        <LogOut size={14} />
+                        <span>تسجيل الخروج</span>
                       </button>
                     </div>
                   </motion.div>
