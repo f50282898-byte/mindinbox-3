@@ -1,7 +1,9 @@
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDGgTDrDJsRvulhzK1p59AbuhJwQYSUufI",
   authDomain: "mindinbox-50d84.firebaseapp.com",
@@ -12,20 +14,7 @@ const firebaseConfig = {
   measurementId: "G-KDFGGPKSB2"
 };
 
-// Initialize variables
-let app: FirebaseApp;
-let auth: Auth;
-let db: Firestore;
-
-// Strictly client-side initialization to prevent SSR hydration mismatches
-if (typeof window !== 'undefined') {
-  try {
-    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    auth = getAuth(app);
-    db = getFirestore(app);
-  } catch (error) {
-    console.error("Firebase Initialization Error:", error);
-  }
-}
-
-export { app, auth, db };
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
