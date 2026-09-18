@@ -11,7 +11,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
-import { KeyRound, Mail, Lock, LogIn, UserPlus, Sparkles, AlertCircle } from 'lucide-react';
+import { KeyRound, Mail, Lock, LogIn, UserPlus, AlertCircle } from 'lucide-react';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -202,10 +202,10 @@ export default function AuthPage() {
             type="button"
             onClick={handleGoogleAuth}
             disabled={isSubmitting}
-            className="w-full py-3.5 rounded-xl bg-white/5 border border-white/10 text-[#EAEAEA] text-xs font-bold hover:bg-white/10 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-3.5 rounded-xl bg-white/5 border border-white/10 text-[var(--text-primary)] text-xs font-bold hover:bg-white/10 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            <Sparkles size={14} className="text-[#D4AF37]" />
-            <span>المصادقة عبر Google</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold-pure)] shadow-[0_0_8px_var(--gold-pure)]" />
+            <span className="font-serif">المصادقة عبر Google</span>
           </button>
         </div>
       </motion.div>
