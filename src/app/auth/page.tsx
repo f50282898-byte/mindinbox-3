@@ -45,16 +45,10 @@ export default function AuthPage() {
       router.push('/');
     } catch (err: any) {
       console.error('Firebase Email Auth Error:', err);
-      // Map common Firebase errors to readable Arabic messages
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-        setError('بيانات الدخول غير صحيحة.');
-      } else if (err.code === 'auth/email-already-in-use') {
-        setError('هذا البريد الإلكتروني مسجل مسبقاً.');
-      } else if (err.code === 'auth/weak-password') {
-        setError('كلمة المرور ضعيفة جداً.');
-      } else {
-        setError(err.message || 'حدث خطأ غير متوقع. يرجى المحاولة لاحقاً.');
-      }
+      // Explicitly show raw Firebase error code and message for production debugging
+      const rawError = `${err.code ? err.code + ': ' : ''}${err.message}`;
+      setError(rawError);
+      alert(`AUTH ERROR -> ${rawError}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -72,7 +66,9 @@ export default function AuthPage() {
       router.push('/');
     } catch (err: any) {
       console.error('Firebase Google Auth Error:', err);
-      setError(err.message || 'حدث خطأ أثناء المصادقة عبر جوجل.');
+      const rawError = `${err.code ? err.code + ': ' : ''}${err.message}`;
+      setError(rawError);
+      alert(`GOOGLE AUTH ERROR -> ${rawError}`);
     } finally {
       setIsSubmitting(false);
     }
