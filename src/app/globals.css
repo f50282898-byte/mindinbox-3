@@ -5,7 +5,7 @@
    ═══════════════════════════════════════════════════ */
 
 :root {
-  /* Core palette */
+  /* Core palette (Dark Default) */
   --bg-void:        #020202;
   --bg-surface:     #080808;
   --bg-elevated:    #0d0d0d;
@@ -29,6 +29,27 @@
   --glass-blur:     4px;   /* Low-Fog: user sees video clearly */
 }
 
+/* Day Theme (Luxurious Frosted White Glass & Muted Gold) */
+:root[data-theme="light"] {
+  --bg-void:        #F9F8F6;
+  --bg-surface:     #F0EDE8;
+  --bg-elevated:    #FFFFFF;
+
+  --gold-pure:      #B79332;
+  --gold-muted:     #8C7326;
+  --gold-dim:       #D4AF37;
+  --gold-glow:      rgba(183, 147, 50, 0.15);
+  --gold-border:    rgba(183, 147, 50, 0.3);
+
+  --text-primary:   #1A1A1A;
+  --text-secondary: #5A5A5A;
+  --text-muted:     #8A8A8A;
+
+  --glass-bg:       rgba(255, 255, 255, 0.6);
+  --glass-border:   rgba(183, 147, 50, 0.2);
+  --glass-hover:    rgba(255, 255, 255, 0.8);
+}
+
 /* ── Base ─────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -45,6 +66,7 @@ body {
   -webkit-font-smoothing: antialiased;
   min-height: 100svh;
   overflow-x: hidden;
+  transition: background-color 0.8s ease, color 0.8s ease;
 }
 
 /* ── Typography ───────────────────────────────────── */
@@ -76,6 +98,10 @@ body {
   border-top-color: rgba(255, 255, 255, 0.1);
   border-left-color: rgba(255, 255, 255, 0.1);
 }
+:root[data-theme="light"] .glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(183, 147, 50, 0.2);
+}
 
 /* ── Gold Glow Effects ────────────────────────────── */
 .glow-gold {
@@ -86,13 +112,22 @@ body {
 .glow-gold-text {
   text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
 }
+:root[data-theme="light"] .glow-gold-text {
+  text-shadow: none;
+}
 
 .gold-gradient {
-  background: linear-gradient(135deg, #D4AF37 0%, #A8892C 50%, #D4AF37 100%);
+  background: linear-gradient(135deg, var(--gold-pure) 0%, var(--gold-muted) 50%, var(--gold-pure) 100%);
 }
 
 .gold-gradient-text {
-  background: linear-gradient(135deg, #E8CC6A 0%, #D4AF37 40%, #A8892C 100%);
+  background: linear-gradient(135deg, #E8CC6A 0%, var(--gold-pure) 40%, var(--gold-muted) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+:root[data-theme="light"] .gold-gradient-text {
+  background: linear-gradient(135deg, #B79332 0%, #8C7326 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -155,9 +190,50 @@ body {
   mix-blend-mode: overlay;
   pointer-events: none;
 }
+:root[data-theme="light"] .noise-overlay {
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+}
 
 /* ── Selection ────────────────────────────────────── */
 ::selection {
   background: rgba(212, 175, 55, 0.25);
-  color: #F0EDE8;
+  color: var(--text-primary);
+}
+
+/* ── Print Styles for Discharge Sanctuary ─────────── */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    background: transparent !important;
+    color: black !important;
+  }
+  .print-hide {
+    display: none !important;
+  }
+  .print-show {
+    display: block !important;
+  }
+  .manuscript-print {
+    margin: 2cm !important;
+    font-family: Georgia, serif !important;
+    font-size: 16pt !important;
+    line-height: 2 !important;
+    text-align: right !important;
+    white-space: pre-wrap !important;
+    direction: rtl !important;
+  }
+  .manuscript-title {
+    font-size: 24pt !important;
+    font-weight: bold !important;
+    margin-bottom: 2cm !important;
+    text-align: center !important;
+    border-bottom: 2px solid black !important;
+    padding-bottom: 10px !important;
+  }
 }

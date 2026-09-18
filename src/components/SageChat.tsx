@@ -2,9 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, Sparkles, Crown, Shield, Brain, RefreshCw } from 'lucide-react';
+import { Send, Bot, Sparkles, Crown, Shield, Brain, Volume2, Fingerprint } from 'lucide-react';
 import { useStore, SageTier } from '@/store/useStore';
-import Link from 'next/link';
+import { useAudioEngine } from '@/hooks/useAudioEngine';
 
 interface Message {
   id: string;
@@ -31,8 +31,26 @@ const RESPONSES_MATRIX: Record<SageTier, string[]> = {
   ],
 };
 
+const getSagePersona = (tier: SageTier) => {
+  switch (tier) {
+    case 'analytical':
+      return 'Dostoevsky';
+    case 'sovereign':
+      return 'Hypatia';
+    default:
+      return 'Avicenna';
+  }
+};
+
+const SageAvatar = ({ tier, size = 20 }: { tier: SageTier; size?: number }) => {
+  if (tier === 'analytical') return <Brain size={size} />;
+  if (tier === 'sovereign') return <Crown size={size} />;
+  return <Bot size={size} />;
+};
+
 export default function SageChat() {
   const { sageTier, setSageTier, isPro } = useStore();
+  const { speak } = useAudioEngine();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'init',
@@ -101,11 +119,11 @@ export default function SageChat() {
       <div className="px-6 py-4 border-b border-white/5 bg-[#050505]/70 backdrop-blur-md flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-            <Bot size={20} />
+            <SageAvatar tier={sageTier} size={20} />
           </div>
           <div>
             <h3 className="font-serif text-lg text-[#EAEAEA] font-semibold flex items-center gap-2">
-              المستشار الفلسفي الذكي
+              {sageTier === 'sovereign' ? 'السيّد الأعظم' : sageTier === 'analytical' ? 'العقل التحليلي' : 'المستشار الفلسفي الذكي'}
             </h3>
             <p className="text-[11px] text-[#888888]">حكمة خالدة، ونقد منطقي صارم في محراب الخلوة</p>
           </div>
@@ -140,7 +158,6 @@ export default function SageChat() {
           <button
             onClick={() => {
               if (!isPro) {
-                // If not pro, switch to sovereign anyway or guide them
                 setSageTier('sovereign');
               } else {
                 setSageTier('sovereign');
@@ -178,11 +195,26 @@ export default function SageChat() {
               >
                 {msg.role === 'sage' && (
                   <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-white/5 text-[10px]">
-                    <span className="text-[#D4AF37] font-semibold flex items-center gap-1">
-                      <Sparkles size={11} />
-                      {msg.tier === 'sovereign' ? 'الاستبصار السيادي الأعمق' : msg.tier === 'analytical' ? 'التحليل المنطقي الصارم' : 'الحكمة الرواقية القياسية'}
-                    </span>
-                    <span className="text-[#888888]">{msg.timestamp}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37]">
+                         <SageAvatar tier={msg.tier} size={10} />
+                      </div>
+                      <span className="text-[#D4AF37] font-semibold flex items-center gap-1">
+                        <Sparkles size={11} />
+                        {msg.tier === 'sovereign' ? 'الاستبصار السيادي الأعمق' : msg.tier === 'analytical' ? 'التحليل المنطقي الصارم' : 'الحكمة الرواقية القياسية'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={() => speak(msg.content, getSagePersona(msg.tier))}
+                        className="text-[#D4AF37] hover:text-[#EAEAEA] transition-colors flex items-center gap-1"
+                        title="إستمع (Re-read)"
+                      >
+                        <Volume2 size={12} />
+                        <span>استمع</span>
+                      </button>
+                      <span className="text-[#888888]">{msg.timestamp}</span>
+                    </div>
                   </div>
                 )}
                 <p className="font-serif text-sm md:text-[15px] leading-[2] whitespace-pre-line text-[#EAEAEA]">

@@ -12,7 +12,9 @@ import {
   User, 
   Radio, 
   Clock,
-  ArrowRight
+  ArrowRight,
+  Mic,
+  Play
 } from 'lucide-react';
 import Link from 'next/link';
 import { useStore } from '@/store/useStore';
@@ -26,6 +28,7 @@ import {
   onSnapshot,
   serverTimestamp 
 } from 'firebase/firestore';
+import { useAudioEngine } from '@/hooks/useAudioEngine';
 
 interface CouncilMessage {
   id: string;
@@ -33,6 +36,7 @@ interface CouncilMessage {
   senderUid: string;
   text: string;
   createdAt: any;
+  audioBlobBase64?: string; // Storing as base64 for simplicity in demo
 }
 
 const SEED_MESSAGES: CouncilMessage[] = [
@@ -65,6 +69,18 @@ export default function SecretCouncil() {
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const { isRecording, startRecording, stopRecording, audioBlob } = useAudioEngine();
+
+  // Convert Blob to Base64 to simulate sending audio over firestore
+  const blobToBase64 = (blob: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
 
   // Real-time Firestore Listener on `pro_council_chat`
   useEffect(() => {
@@ -89,6 +105,7 @@ export default function SecretCouncil() {
                 senderName: data.senderName || 'سالك مجهول',
                 senderUid: data.senderUid || '',
                 text: data.text || '',
+                audioBlobBase64: data.audioBlobBase64 || '',
                 createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString(),
               });
             });
@@ -116,19 +133,25 @@ export default function SecretCouncil() {
     }
   }, [messages, isPro]);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isSending) return;
+  const handleSendMessage = async (e?: React.FormEvent, audioToSend?: Blob) => {
+    if (e) e.preventDefault();
+    if ((!input.trim() && !audioToSend) || isSending) return;
 
     const messageText = input.trim();
     setInput('');
     setIsSending(true);
+
+    let audioBase64 = '';
+    if (audioToSend) {
+      audioBase64 = await blobToBase64(audioToSend);
+    }
 
     const localMessage: CouncilMessage = {
       id: Date.now().toString(),
       senderName: user.displayName,
       senderUid: user.uid,
       text: messageText,
+      audioBlobBase64: audioBase64,
       createdAt: new Date().toISOString(),
     };
 
@@ -139,6 +162,7 @@ export default function SecretCouncil() {
         senderName: user.displayName,
         senderUid: user.uid,
         text: messageText,
+        audioBlobBase64: audioBase64,
         createdAt: serverTimestamp(),
       });
     } catch (err) {
@@ -146,6 +170,18 @@ export default function SecretCouncil() {
     } finally {
       setIsSending(false);
     }
+  };
+
+  useEffect(() => {
+    // If audio is successfully recorded and we are not recording anymore, send it.
+    if (audioBlob && !isRecording) {
+      handleSendMessage(undefined, audioBlob);
+    }
+  }, [audioBlob, isRecording]);
+
+  const playAudio = (base64Audio: string) => {
+    const audio = new Audio(base64Audio);
+    audio.play();
   };
 
   // If Not Pro: Render Majestic Golden Locked Gate
@@ -243,7 +279,18 @@ export default function SecretCouncil() {
                       {typeof m.createdAt === 'string' ? m.createdAt.slice(11, 16) : 'الآن'}
                     </span>
                   </div>
-                  <p className="font-serif text-sm leading-relaxed">{m.text}</p>
+                  {m.text && <p className="font-serif text-sm leading-relaxed">{m.text}</p>}
+                  {m.audioBlobBase64 && (
+                    <div className="mt-2 flex items-center gap-2">
+                       <button 
+                         onClick={() => playAudio(m.audioBlobBase64!)}
+                         className="flex items-center gap-2 bg-[#D4AF37]/20 border border-[#D4AF37]/40 py-1.5 px-3 rounded-full hover:bg-[#D4AF37]/30 transition-colors"
+                       >
+                         <Play size={12} className="text-[#D4AF37]" />
+                         <span className="text-xs text-[#D4AF37]">رسالة صوتية</span>
+                       </button>
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -252,21 +299,42 @@ export default function SecretCouncil() {
         </div>
 
         {/* Input Form */}
-        <div className="p-4 bg-[#050505] border-t border-white/5">
-          <form onSubmit={handleSendMessage} className="relative flex items-center">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="اكتب رسالتك إلى إخوانك في المجلس السري..."
-              className="w-full px-5 py-3.5 pl-14 rounded-xl bg-black border border-white/15 text-xs text-[#EAEAEA] placeholder-[#888888] focus:outline-none focus:border-[#D4AF37]"
-            />
+        <div className="p-4 bg-[#050505] border-t border-white/5 relative">
+          <form onSubmit={handleSendMessage} className="relative flex items-center gap-2">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={isRecording ? "جاري تسجيل رسالتك الصوتية..." : "اكتب رسالتك إلى إخوانك في المجلس السري..."}
+                disabled={isRecording}
+                className="w-full px-5 py-3.5 pl-14 rounded-xl bg-black border border-white/15 text-xs text-[#EAEAEA] placeholder-[#888888] focus:outline-none focus:border-[#D4AF37]"
+              />
+              <button
+                type="submit"
+                disabled={!input.trim() || isSending || isRecording}
+                className="absolute left-2.5 top-2 p-2 rounded-lg bg-[#D4AF37] text-black hover:bg-[#AA7C11] disabled:opacity-30 transition-all"
+              >
+                <Send size={15} className="rotate-180" />
+              </button>
+            </div>
+            
+            {/* Hold to Record Button */}
             <button
-              type="submit"
-              disabled={!input.trim() || isSending}
-              className="absolute left-2.5 p-2.5 rounded-lg bg-[#D4AF37] text-black hover:bg-[#AA7C11] disabled:opacity-30 transition-all"
+              type="button"
+              onMouseDown={startRecording}
+              onMouseUp={stopRecording}
+              onMouseLeave={stopRecording}
+              onTouchStart={startRecording}
+              onTouchEnd={stopRecording}
+              className={`p-3.5 rounded-xl border transition-all ${
+                isRecording 
+                  ? 'bg-red-900/40 border-red-500 text-red-500 animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.5)]' 
+                  : 'bg-black border-white/15 text-[#D4AF37] hover:border-[#D4AF37]/50'
+              }`}
+              title="اضغط مطولاً للتسجيل"
             >
-              <Send size={15} className="rotate-180" />
+              <Mic size={18} />
             </button>
           </form>
         </div>

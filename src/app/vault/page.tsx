@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -14,6 +14,8 @@ import {
   Sparkles,
   Shield,
   Star,
+  Flame,
+  PhoneCall
 } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { useVideoTheme } from '@/components/VideoBackground';
@@ -80,33 +82,19 @@ const STORY_PANELS = [
   },
 ];
 
-const PRO_FEATURES = [
-  {
-    key: 'council',
-    title: 'المجلس السري ٢٤/٧',
-    desc: 'محادثات AI بذاكرة دائمة وغير محدودة. ٣٤ عضو نشط الآن.',
-    Icon: Users,
-  },
-  {
-    key: 'psych',
-    title: 'المخطط النفسي الشهري',
-    desc: 'تقرير تحليلي عميق لأنماط تفكيرك وتطور عقلك كل شهر.',
-    Icon: Brain,
-  },
-  {
-    key: 'audio',
-    title: 'التصدير الصوتي المعرفي',
-    desc: 'حوّل يومياتك ومذكراتك إلى بودكاست صوتي احترافي.',
-    Icon: Mic,
-  },
-];
-
 const PERKS = [
   'الولوج المطلق إلى المجلس السري',
   'تقرير نفسي شهري مخصص',
   'تحويل اليوميات لبودكاست صوتي',
   'فتح النمط السيادي للمستشار',
   'مكتبة المحاضرات الحصرية',
+];
+
+const ULTRA_PERKS = [
+  ...PERKS,
+  'مكالمة 45 دقيقة شهرية فردية استراتيجية (1-on-1)',
+  'تحليل أسبوعي مخصص لقراراتك',
+  'الوصول لنسخة تجريبية مبكرة لأي ميزة',
 ];
 
 const AVATARS = ['ع', 'خ', 'ب', 'ف'];
@@ -242,10 +230,75 @@ function FeatureCard({
   );
 }
 
+// Hook to create a realistic ever-growing user count based on math/time
+function useStrategicCounter(baseNumber: number) {
+  const [count, setCount] = useState(baseNumber);
+
+  useEffect(() => {
+    // Math logic based on current timestamp
+    // Base date to start incrementing from: Jan 1, 2026
+    const baseDate = new Date('2026-01-01T00:00:00Z').getTime();
+    const now = Date.now();
+    const elapsedHours = (now - baseDate) / (1000 * 60 * 60);
+    
+    // Add ~2 users per hour on average
+    const increment = Math.floor(elapsedHours * 2.14);
+    
+    setCount(baseNumber + increment);
+  }, [baseNumber]);
+
+  return count;
+}
+
 export default function Vault() {
   const { isPro } = useStore();
   const { setTheme } = useVideoTheme();
   const router = useRouter();
+  const userCount = useStrategicCounter(3450);
+  
+  // Velvet Rope Modal State
+  const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
+  const [reason, setReason] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleApplicationSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reason.trim()) return;
+    
+    setIsSubmitting(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSuccess(true);
+      setTimeout(() => {
+        setIsApplicationModalOpen(false);
+        setIsSuccess(false);
+        setReason('');
+      }, 3000);
+    }, 2000);
+  };
+
+  const PRO_FEATURES = [
+    {
+      key: 'council',
+      title: 'المجلس السري ٢٤/٧',
+      desc: `محادثات AI بذاكرة دائمة وغير محدودة. ${userCount} عضو نشط الآن.`,
+      Icon: Users,
+    },
+    {
+      key: 'psych',
+      title: 'المخطط النفسي الشهري',
+      desc: 'تقرير تحليلي عميق لأنماط تفكيرك وتطور عقلك كل شهر.',
+      Icon: Brain,
+    },
+    {
+      key: 'audio',
+      title: 'التصدير الصوتي المعرفي',
+      desc: 'حوّل يومياتك ومذكراتك إلى بودكاست صوتي احترافي.',
+      Icon: Mic,
+    },
+  ];
 
   useEffect(() => {
     setTheme({ src: '/videos/vault.mp4', overlayOpacity: 0.6 });
@@ -397,8 +450,8 @@ export default function Vault() {
               </div>
             ))}
           </div>
-          <span className="text-sm font-serif text-[var(--gold-pure)]">
-            انضم إلى ٣٤ عقلاً سيادياً
+          <span className="text-sm font-serif text-[var(--gold-pure)] whitespace-nowrap">
+            انضم إلى {userCount.toLocaleString('ar-SA')} عقلاً سيادياً
           </span>
         </motion.div>
       </section>
@@ -419,7 +472,7 @@ export default function Vault() {
                 boxShadow: `0 0 30px ${panel.glow}`,
               }}
             >
-              <div className="text-3xl mb-4">{panel.icon}</div>
+              <div className="text-3xl mb-4 text-[#D4AF37] font-serif font-bold opacity-80">{panel.icon}</div>
               <span
                 className="text-xs uppercase tracking-widest font-semibold mb-1"
                 style={{ color: panel.accent }}
@@ -472,90 +525,222 @@ export default function Vault() {
         </div>
       </section>
 
-      <section className="px-4 max-w-xl mx-auto mb-20">
-        <motion.div
-          variants={scaleIn}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="glass-gold rounded-3xl p-8 md:p-12 relative overflow-hidden"
-          style={{ boxShadow: '0 30px 80px rgba(0,0,0,0.7)' }}
-        >
-          <div className="absolute top-0 inset-x-0 h-px shimmer" />
-
-          <div className="flex items-center gap-2 mb-6">
-            <Star size={14} className="text-[var(--gold-pure)]" />
-            <span className="text-xs uppercase tracking-widest text-[var(--gold-pure)] font-semibold">
-              الاشتراك السيادي الوحيد
-            </span>
-          </div>
-
-          <div className="mb-2">
-            <span className="font-serif text-6xl md:text-7xl font-bold gold-gradient-text">
-              $19.99
-            </span>
-            <span className="text-[var(--text-muted)] text-base font-serif mr-2">/ شهر</span>
-          </div>
-          <p className="text-sm text-[var(--text-secondary)] font-serif mb-4">
-            أو <span className="text-[var(--gold-pure)] font-semibold">$199 / سنوياً</span>{' '}
-            (وفّر ١٧٪)
-          </p>
-
-          <div
-            className="rounded-xl p-4 mb-8 text-sm font-serif text-[var(--text-secondary)] leading-relaxed"
-            style={{
-              background: 'rgba(212,175,55,0.05)',
-              border: '1px solid rgba(212,175,55,0.12)',
-            }}
+      <section className="px-4 max-w-5xl mx-auto mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          {/* Pro Tier */}
+          <motion.div
+            variants={scaleIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="glass-card rounded-3xl p-8 md:p-12 relative overflow-hidden flex flex-col h-full"
           >
-            خدمة التوجيه التنفيذي الفردي تُقدَّر بـ{' '}
-            <span className="text-[var(--gold-pure)] font-bold">$5,000 شهرياً</span>. هذا هو
-            سعرها لأصحاب العقول الجادة.
-          </div>
+            <div className="flex items-center gap-2 mb-6">
+              <Star size={14} className="text-[var(--gold-pure)]" />
+              <span className="text-xs uppercase tracking-widest text-[var(--gold-pure)] font-semibold">
+                الاشتراك السيادي
+              </span>
+            </div>
 
-          <div className="space-y-3 mb-10 border-t border-b py-7" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-            {PERKS.map((perk, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: 10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08, duration: 0.4 }}
-                className="flex items-center gap-3"
-              >
-                <div
-                  className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
-                  style={{
-                    background: 'rgba(212,175,55,0.15)',
-                    border: '1px solid rgba(212,175,55,0.4)',
-                  }}
+            <div className="mb-2">
+              <span className="font-serif text-5xl md:text-6xl font-bold text-[#EAEAEA]">
+                $19.99
+              </span>
+              <span className="text-[var(--text-muted)] text-base font-serif mr-2">/ شهر</span>
+            </div>
+            <p className="text-sm text-[var(--text-secondary)] font-serif mb-4">
+              أو <span className="text-[var(--gold-pure)] font-semibold">$199 / سنوياً</span>{' '}
+              (وفّر ١٧٪)
+            </p>
+
+            <div className="space-y-3 mb-10 border-t border-b py-7 flex-1" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+              {PERKS.map((perk, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: 10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08, duration: 0.4 }}
+                  className="flex items-center gap-3"
                 >
-                  <Check size={11} className="text-[var(--gold-pure)]" />
-                </div>
-                <span className="text-sm font-serif text-[var(--text-primary)]">{perk}</span>
-              </motion.div>
-            ))}
-          </div>
+                  <div
+                    className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-white/5 border border-white/10"
+                  >
+                    <Check size={11} className="text-[#888888]" />
+                  </div>
+                  <span className="text-sm font-serif text-[#EAEAEA]">{perk}</span>
+                </motion.div>
+              ))}
+            </div>
 
-          <motion.button
-            whileHover={{ scale: 1.02, filter: 'brightness(1.12)' }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => router.push('/vault/checkout')}
-            className="w-full py-4 px-6 rounded-2xl font-bold text-sm tracking-widest uppercase flex items-center justify-center gap-2 group text-black transition-all"
-            style={{
-              background: 'linear-gradient(135deg, #AA7C11 0%, #D4AF37 50%, #E8CC6A 100%)',
-              boxShadow: '0 0 40px rgba(212,175,55,0.35)',
-            }}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => router.push('/vault/checkout')}
+              className="w-full py-4 px-6 rounded-2xl font-bold text-sm tracking-widest uppercase flex items-center justify-center gap-2 group text-white bg-white/10 hover:bg-white/15 transition-all border border-white/20"
+            >
+              <span>ختم الميثاق القياسي</span>
+            </motion.button>
+          </motion.div>
+
+          {/* Ultra Pro Tier */}
+          <motion.div
+            variants={scaleIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="glass-gold rounded-3xl p-8 md:p-12 relative overflow-hidden flex flex-col h-full"
+            style={{ boxShadow: '0 30px 80px rgba(0,0,0,0.7)' }}
           >
-            <Sparkles size={18} className="group-hover:rotate-12 transition-transform" />
-            <span>ختم الميثاق — $19.99 / شهر</span>
-          </motion.button>
+            <div className="absolute top-0 inset-x-0 h-px shimmer" />
+            <div className="absolute -top-10 -right-10 text-[var(--gold-pure)] opacity-10 blur-2xl">
+              <Crown size={150} />
+            </div>
 
-          <p className="text-center text-xs text-[var(--text-muted)] mt-5 font-serif tracking-wide">
-            إلغاء فوري · تشفير بنكي · بدون تعهدات
-          </p>
-        </motion.div>
+            <div className="flex items-center gap-2 mb-6">
+              <Crown size={16} className="text-[var(--gold-pure)]" />
+              <span className="text-xs uppercase tracking-widest text-[var(--gold-pure)] font-semibold">
+                العهد السيادي الأعظم (Ultra Pro)
+              </span>
+            </div>
+
+            <div className="mb-2">
+              <span className="font-serif text-5xl md:text-6xl font-bold gold-gradient-text">
+                $149
+              </span>
+              <span className="text-[var(--text-muted)] text-base font-serif mr-2">/ شهر</span>
+            </div>
+            
+            <div
+              className="rounded-xl p-4 mt-4 mb-4 text-sm font-serif text-[var(--text-secondary)] leading-relaxed relative overflow-hidden"
+              style={{
+                background: 'rgba(212,175,55,0.05)',
+                border: '1px solid rgba(212,175,55,0.12)',
+              }}
+            >
+              <div className="absolute -left-2 top-2 opacity-20">
+                <Flame size={32} className="text-[var(--gold-pure)]" />
+              </div>
+              القيمة الجوهرية: مكالمة فردية حية مدتها 45 دقيقة شهرياً لتفكيك وتوجيه استراتيجيتك الفلسفية وجهاً لوجه. تُقدَّر قيمة التوجيه التنفيذي المماثل بـ <span className="text-[var(--gold-pure)] font-bold">$5,000 شهرياً</span>.
+            </div>
+
+            <div className="space-y-3 mb-10 border-t border-b py-7 flex-1 z-10" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+              {ULTRA_PERKS.map((perk, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: 10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08, duration: 0.4 }}
+                  className="flex items-center gap-3"
+                >
+                  <div
+                    className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                    style={{
+                      background: 'rgba(212,175,55,0.15)',
+                      border: '1px solid rgba(212,175,55,0.4)',
+                    }}
+                  >
+                    <Check size={11} className="text-[var(--gold-pure)]" />
+                  </div>
+                  <span className="text-sm font-serif text-[var(--text-primary)]">{perk}</span>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.02, filter: 'brightness(1.12)' }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setIsApplicationModalOpen(true)}
+              className="w-full py-4 px-6 rounded-2xl font-bold text-sm tracking-widest uppercase flex items-center justify-center gap-2 group text-[var(--gold-pure)] transition-all z-10 border border-[var(--gold-pure)] bg-[var(--gold-glow)]"
+              style={{
+                boxShadow: '0 0 20px rgba(212,175,55,0.15)',
+              }}
+            >
+              <Crown size={18} className="group-hover:scale-110 transition-transform" />
+              <span>قدّم طلب الانضمام للنخبة</span>
+            </motion.button>
+          </motion.div>
+          
+        </div>
+        <p className="text-center text-xs text-[var(--text-muted)] mt-5 font-serif tracking-wide">
+          إلغاء فوري · تشفير بنكي · بدون تعهدات
+        </p>
       </section>
+
+      {/* VELVET ROPE APPLICATION MODAL */}
+      <AnimatePresence>
+        {isApplicationModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+            dir="rtl"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="w-full max-w-md p-8 rounded-3xl glass-gold relative overflow-hidden text-center"
+            >
+              {!isSuccess ? (
+                <form onSubmit={handleApplicationSubmit}>
+                  <div className="w-16 h-16 mx-auto rounded-full bg-[var(--gold-glow)] border border-[var(--gold-border)] flex items-center justify-center text-[var(--gold-pure)] mb-6 shadow-[0_0_40px_rgba(212,175,55,0.2)]">
+                    <Crown size={28} />
+                  </div>
+                  <h3 className="text-2xl font-serif font-bold text-[var(--text-primary)] mb-3">طلب الانضمام للمجلس الأعلى</h3>
+                  <p className="text-sm text-[var(--text-secondary)] font-serif mb-6 leading-relaxed">
+                    لماذا تعتقد أن أفكارك تستحق وقت المجلس الأعلى؟
+                  </p>
+                  <textarea
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    className="w-full h-32 px-4 py-3 rounded-xl bg-black/40 border border-[var(--gold-border)] text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--gold-pure)] transition-colors resize-none mb-6 font-serif"
+                    placeholder="اكتب مبرراتك هنا..."
+                    required
+                  />
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsApplicationModalOpen(false)}
+                      className="flex-1 py-3 rounded-xl border border-white/10 text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)] transition-all text-sm font-bold font-serif"
+                    >
+                      تراجع
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || !reason.trim()}
+                      className="flex-[2] py-3 rounded-xl gold-gradient text-black font-bold text-sm tracking-wide shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] transition-all flex items-center justify-center disabled:opacity-50 font-serif"
+                    >
+                      {isSubmitting ? (
+                        <div className="w-5 h-5 rounded-full border-2 border-black border-t-transparent animate-spin" />
+                      ) : (
+                        "إرسال الطلب"
+                      )}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="py-10"
+                >
+                  <div className="w-20 h-20 mx-auto rounded-full bg-[var(--gold-glow)] border border-[var(--gold-border)] flex items-center justify-center text-[var(--gold-pure)] mb-6 shadow-[0_0_60px_rgba(212,175,55,0.3)] unlock-pulse">
+                    <Check size={32} />
+                  </div>
+                  <h3 className="text-2xl font-serif font-bold text-[var(--gold-pure)] mb-4">الطلب قيد الدراسة</h3>
+                  <p className="text-[var(--text-secondary)] font-serif leading-relaxed">
+                    سيتم دراسة طلبك من قبل الحكماء. سنرسل لك الرد قريباً.
+                  </p>
+                </motion.div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

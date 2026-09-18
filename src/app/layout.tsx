@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Tajawal } from "next/font/google";
 import "./globals.css";
 import DynamicIsland from "@/components/DynamicIsland";
-import VideoBackground from "@/components/VideoBackground";
+import CinematicBackground from "@/components/CinematicBackground";
 import GlobalErrorBoundary from "@/components/GlobalErrorBoundary";
 import { AuthProvider } from "@/context/AuthContext";
 
@@ -36,8 +36,8 @@ export default function RootLayout({
       >
         <GlobalErrorBoundary>
           <AuthProvider>
-            {/* Fixed full-screen video/gradient background — sits behind everything */}
-            <VideoBackground />
+            {/* The Global Cinematic Video Engine — sits behind everything */}
+            <CinematicBackground />
 
             {/* Floating navigation pill */}
             <DynamicIsland />

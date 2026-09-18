@@ -12,11 +12,13 @@ import {
   KeyRound, 
   Crown,
   ShieldAlert,
-  ArrowLeft
+  ArrowLeft,
+  Lock
 } from 'lucide-react';
 import Link from 'next/link';
 import { useStore } from '@/store/useStore';
 import { motion } from 'framer-motion';
+import HiddenSeal from '@/components/HiddenSeal';
 
 export default function Home() {
   const { user, isPro } = useStore();
@@ -55,6 +57,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full fade-in space-y-16 pb-32" dir="rtl">
+      <HiddenSeal />
       {/* Hero Welcome */}
       <div className="text-center space-y-4 pt-4 max-w-2xl mx-auto">
         <motion.div
@@ -124,6 +127,55 @@ export default function Home() {
             );
           })}
         </div>
+      </section>
+
+      {/* The Monthly Blueprint Teaser */}
+      <section className="w-full">
+        <Link href="/vault" className="block w-full">
+          <motion.div
+            whileHover={{ scale: 1.01 }}
+            className="relative w-full rounded-3xl overflow-hidden glass-gold shadow-[0_0_40px_rgba(212,175,55,0.08)] group"
+          >
+            {/* Background Data Viz Simulation */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none overflow-hidden">
+              <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                <path d="M0,50 Q25,30 50,50 T100,50" fill="none" stroke="var(--gold-pure)" strokeWidth="0.5" className="animate-pulse" />
+                <path d="M0,70 Q25,90 50,70 T100,70" fill="none" stroke="var(--gold-muted)" strokeWidth="0.3" opacity="0.5" />
+                <path d="M0,30 Q25,10 50,30 T100,30" fill="none" stroke="var(--gold-dim)" strokeWidth="0.2" opacity="0.3" />
+                {/* Vertical bars simulating data */}
+                {[...Array(20)].map((_, i) => (
+                  <rect key={i} x={i * 5 + 2} y={100 - (Math.random() * 40 + 20)} width="1.5" height="100" fill="var(--gold-pure)" opacity={0.1 + Math.random() * 0.2} />
+                ))}
+              </svg>
+            </div>
+            
+            <div className="relative p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 backdrop-blur-sm bg-black/40">
+              <div className="flex-1 text-right z-10">
+                <div className="inline-flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-[var(--gold-glow)] border border-[var(--gold-border)] flex items-center justify-center text-[var(--gold-pure)] unlock-pulse">
+                    <Lock size={14} />
+                  </div>
+                  <span className="text-[10px] uppercase tracking-widest text-[var(--gold-muted)] font-serif border border-[var(--gold-border)] px-2 py-0.5 rounded-full bg-[var(--gold-glow)]">
+                    حصرية العهد السيادي
+                  </span>
+                </div>
+                <h3 className="text-2xl font-serif font-bold text-[var(--text-primary)] mb-3 group-hover:text-[var(--gold-pure)] transition-colors">
+                  التحليل النفسي الشهري
+                </h3>
+                <p className="text-sm md:text-base text-[var(--text-secondary)] max-w-2xl leading-relaxed font-serif">
+                  خوارزمياتنا رصدت نمطاً متكرراً في أفكارك هذا الأسبوع. افتح المجلس السري لفك الشيفرة واكتشاف الدوافع الخفية خلف قراراتك.
+                </p>
+              </div>
+              
+              <div className="shrink-0 z-10 w-full md:w-auto">
+                <button className="w-full md:w-auto px-6 py-3 rounded-xl gold-gradient text-black font-bold text-sm shadow-[0_0_20px_rgba(212,175,55,0.3)] group-hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] transition-all flex items-center justify-center gap-2">
+                  <KeyRound size={16} />
+                  <span>فك الشيفرة الآن</span>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </Link>
       </section>
 
       {/* Tracking & Practical Sanctuaries: ميزان الجرد + هندسة المزاج + طور أفكارك */}
