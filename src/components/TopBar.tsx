@@ -1,127 +1,125 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
-import { Menu, User, Settings, LogOut } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { Menu, User, Settings, LogOut, AlertTriangle } from 'lucide-react';
 import { useStore } from '@/store/useStore';
+import { useAuth } from '@/context/AuthContext';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/firebase';
+import { useRouter } from 'next/navigation';
 import SettingsModal from './SettingsModal';
 
 export default function TopBar() {
-  const { isSidebarOpen, toggleSidebar, user, isPro } = useStore();
+  const { toggleSidebar, user, isPro, userPersona } = useStore();
   const { currentUser } = useAuth();
-  
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const profileRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
-        setIsProfileOpen(false);
-      }
+  const handleSignOut = async () => {
+    if (auth) {
+      await signOut(auth);
+      router.push('/auth');
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  };
 
   return (
     <>
-      <header className="fixed top-0 inset-x-0 z-[60] px-4 md:px-8 py-5 flex items-center justify-between pointer-events-none" dir="rtl">
-        
-        <div className="flex items-center gap-4 pointer-events-auto">
-          {/* Hamburger */}
+      <header className="absolute top-0 left-0 right-0 z-[60] px-6 py-5 flex items-center justify-between pointer-events-none">
+        {/* Right Side (Start in RTL): Hamburger + Logo */}
+        <div className="flex items-center gap-5 pointer-events-auto">
           <button
             onClick={toggleSidebar}
-            className="w-10 h-10 rounded-full glass border border-[var(--glass-border)] flex items-center justify-center text-[var(--text-primary)] hover:bg-white/10 hover:text-[var(--gold-pure)] transition-all shadow-[0_0_20px_rgba(0,0,0,0.3)]"
+            className="p-2 rounded-full hover:bg-[var(--glass-bg)] border border-transparent hover:border-[var(--glass-border)] transition-all text-[var(--text-primary)]"
           >
-            <Menu size={18} strokeWidth={1.5} />
+            <Menu size={24} strokeWidth={1.5} />
           </button>
-
-          {/* Logo */}
-          <Link href="/" className="group hidden sm:block">
-            <h1 
-              className="font-reem text-2xl font-bold text-[var(--gold-pure)] transition-all group-hover:scale-105"
-              style={{ textShadow: '0 0 15px rgba(212, 175, 55, 0.3)' }}
-            >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--gold-pure)] to-[var(--gold-dim)] flex items-center justify-center opacity-90 shadow-[0_0_15px_rgba(212,175,55,0.3)]">
+              <span className="font-reem text-black font-bold text-lg leading-none">ع</span>
+            </div>
+            <h1 className="font-reem text-xl text-[var(--text-primary)] tracking-wide glow-gold-text hidden sm:block">
               عقل في صندوق
             </h1>
-          </Link>
+          </div>
         </div>
 
-        {/* User Profile Area */}
-        <div className="pointer-events-auto relative" ref={profileRef}>
+        {/* Left Side (End in RTL): Avatar */}
+        <div className="relative pointer-events-auto">
           <button
-            onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className="w-10 h-10 rounded-full glass border border-[var(--glass-border)] flex items-center justify-center text-[var(--text-primary)] hover:bg-white/10 hover:border-[var(--gold-pure)] transition-all shadow-[0_0_20px_rgba(0,0,0,0.3)] overflow-hidden relative"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="w-10 h-10 rounded-full border border-[var(--gold-border)] bg-[var(--glass-bg)] flex items-center justify-center overflow-hidden hover:border-[var(--gold-pure)] transition-all"
           >
-             {currentUser?.photoURL ? (
-               <img src={currentUser.photoURL} alt="Profile" className="w-full h-full object-cover" />
-             ) : (
-               <User size={16} strokeWidth={1.5} />
-             )}
-             {isPro && (
-                <div className="absolute inset-0 rounded-full border border-[var(--gold-pure)] animate-pulse pointer-events-none" />
-             )}
+            {currentUser?.photoURL ? (
+              <img src={currentUser.photoURL} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              <User size={18} className="text-[var(--gold-pure)]" strokeWidth={1.5} />
+            )}
           </button>
 
-          {/* Profile Dropdown */}
           <AnimatePresence>
-            {isProfileOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                className="absolute top-14 left-0 w-64 bg-black/60 backdrop-blur-2xl rounded-2xl p-4 flex flex-col shadow-2xl border border-white/10 z-[70]"
-                dir="rtl"
-              >
-                <div className="pb-3 border-b border-white/10 mb-3">
-                  <p className="font-serif font-bold text-sm text-[var(--text-primary)]">
-                    {currentUser?.displayName || user.displayName || 'السالك المستنير'}
-                  </p>
-                  <p className="text-xs text-[var(--text-secondary)] font-sans truncate mt-1">
-                    {currentUser?.email || user.email || 'salik@mindinbox.io'}
-                  </p>
-                </div>
-                
-                <button
-                  onClick={() => {
-                    setIsProfileOpen(false);
-                    setIsSettingsOpen(true);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-serif text-[var(--text-primary)] hover:bg-white/10 transition-colors text-right"
+            {isDropdownOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setIsDropdownOpen(false)} 
+                />
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute left-0 top-14 w-64 glass rounded-2xl p-4 z-50 flex flex-col gap-4 shadow-2xl"
+                  dir="rtl"
                 >
-                  <Settings size={16} strokeWidth={1.5} />
-                  <span>الإعدادات المتقدمة</span>
-                </button>
-                
-                {!isPro && (
-                  <div className="mt-3 p-3 rounded-xl bg-[var(--gold-glow)] border border-[var(--gold-border)] flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold-pure)] mt-1.5 shrink-0 shadow-[0_0_8px_var(--gold-pure)]" />
-                    <p className="text-[10px] leading-relaxed font-serif text-[var(--text-secondary)]">
-                      العهد التجريبي ينتهي قريباً. <Link href="/vault" className="text-[var(--gold-pure)] font-bold hover:underline" onClick={() => setIsProfileOpen(false)}>قم بالترقية للعهد السيادي.</Link>
-                    </p>
+                  <div className="flex flex-col gap-1 border-b border-[var(--glass-border)] pb-3">
+                    <span className="font-serif font-bold text-[var(--text-primary)] truncate">
+                      {currentUser?.displayName || user.displayName}
+                    </span>
+                    <span className="font-sans text-xs text-[var(--text-muted)] truncate">
+                      {currentUser?.email || user.email}
+                    </span>
+                    <div className="mt-2 inline-flex items-center justify-center py-1 px-3 rounded-full bg-[var(--gold-pure)]/10 border border-[var(--gold-pure)]/30 text-[var(--gold-pure)] text-[10px] uppercase font-bold tracking-widest">
+                      {userPersona}
+                    </div>
                   </div>
-                )}
-                
-                <button
-                  onClick={() => setIsProfileOpen(false)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 mt-2 rounded-xl text-sm font-serif text-red-400/80 hover:bg-red-500/10 hover:text-red-400 transition-colors text-right"
-                >
-                  <LogOut size={16} strokeWidth={1.5} />
-                  <span>تسجيل الخروج</span>
-                </button>
-              </motion.div>
+
+                  <div className="flex flex-col gap-2">
+                    <button 
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        setIsSettingsOpen(true);
+                      }}
+                      className="flex items-center gap-3 p-2 rounded-xl hover:bg-[var(--glass-bg)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors text-sm font-serif"
+                    >
+                      <Settings size={16} strokeWidth={1.5} />
+                      تخصيص التجربة
+                    </button>
+                    <button 
+                      onClick={handleSignOut}
+                      className="flex items-center gap-3 p-2 rounded-xl hover:bg-red-900/10 text-red-500/80 hover:text-red-400 transition-colors text-sm font-serif"
+                    >
+                      <LogOut size={16} strokeWidth={1.5} />
+                      تسجيل الخروج
+                    </button>
+                  </div>
+
+                  {!isPro && (
+                    <div className="mt-2 p-3 rounded-xl bg-red-950/20 border border-red-900/30 flex items-start gap-2">
+                      <AlertTriangle size={14} className="text-red-500 shrink-0 mt-0.5" strokeWidth={1.5} />
+                      <p className="text-[10px] text-red-400/90 font-serif leading-relaxed">
+                        العهد التجريبي يشارف على الانتهاء. ستفقد سيادتك على المجلس قريباً.
+                      </p>
+                    </div>
+                  )}
+                </motion.div>
+              </>
             )}
           </AnimatePresence>
         </div>
-
       </header>
 
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </>
   );
 }
-

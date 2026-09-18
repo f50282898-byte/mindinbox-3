@@ -10,7 +10,7 @@ import {
   Crown,
   Lock,
   ShieldCheck,
-  Sparkles,
+  
 } from 'lucide-react';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
@@ -201,7 +201,7 @@ export default function VaultCheckoutPage() {
               </button>
 
               <div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[#888888]">
-                <Sparkles size={12} className="text-[#D4AF37]" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold-pure)] shadow-[0_0_8px_var(--gold-pure)]" />
                 <span>إلغاء فوري · تشفير بنكي</span>
               </div>
             </form>
@@ -211,3 +211,4 @@ export default function VaultCheckoutPage() {
     </main>
   );
 }
+

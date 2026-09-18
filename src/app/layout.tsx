@@ -4,8 +4,7 @@ import "./globals.css";
 import CinematicBackground from "@/components/CinematicBackground";
 import GlobalErrorBoundary from "@/components/GlobalErrorBoundary";
 import { AuthProvider } from "@/context/AuthContext";
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
+import ClientLayout from "@/components/ClientLayout";
 
 const reemKufi = Reem_Kufi({
   subsets: ["arabic", "latin"],
@@ -39,17 +38,9 @@ export default function RootLayout({
           <AuthProvider>
             <CinematicBackground />
 
-            <div className="flex h-[100svh] w-full overflow-hidden relative">
-              <Sidebar />
-              
-              <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 relative">
-                <TopBar />
-                
-                <main className="flex-1 relative w-full h-full flex flex-col z-10 overflow-hidden">
-                  {children}
-                </main>
-              </div>
-            </div>
+            <ClientLayout>
+              {children}
+            </ClientLayout>
           </AuthProvider>
         </GlobalErrorBoundary>
       </body>

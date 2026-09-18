@@ -290,12 +290,50 @@ export default function CatharsisJournal() {
 
       {/* Off-screen container for PDF export */}
       <div className="absolute top-[-9999px] left-[-9999px] opacity-0 pointer-events-none">
-        <div id="pdf-export-container" style={{ padding: '40px', background: 'white', color: 'black', fontFamily: 'var(--font-tajawal), sans-serif', direction: 'rtl', width: '800px' }}>
-          <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '40px', textAlign: 'center', borderBottom: '2px solid black', paddingBottom: '20px' }}>
+        <div 
+          id="pdf-export-container" 
+          style={{ 
+            padding: '20mm', 
+            width: '210mm', 
+            backgroundColor: '#FFFFFF', 
+            color: '#000000', 
+            fontFamily: 'var(--font-tajawal), sans-serif', 
+            direction: 'rtl' 
+          }}
+        >
+          {/* Header */}
+          <div style={{ borderBottom: '2px solid #000000', paddingBottom: '20px', marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div>
+              <h1 style={{ fontFamily: 'var(--font-reem-kufi), sans-serif', fontSize: '24pt', fontWeight: 'bold', margin: 0 }}>
+                عقل في صندوق
+              </h1>
+              <p style={{ fontSize: '12pt', color: '#555555', marginTop: '5px' }}>مخطوطة الجرد اليومي</p>
+            </div>
+            <div style={{ fontSize: '12pt', fontWeight: 'bold' }}>
+              {new Date().toLocaleDateString('ar-SA')}
+            </div>
+          </div>
+
+          {/* Title */}
+          <h2 style={{ fontSize: '20pt', fontWeight: 'bold', marginBottom: '20px', textAlign: 'center', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
             {title}
-          </h1>
-          <div style={{ fontSize: '18px', lineHeight: '2', whiteSpace: 'pre-wrap' }}>
-            {content}
+          </h2>
+
+          {/* Content (Splitting by paragraphs to apply pagination avoidance) */}
+          <div style={{ fontSize: '14pt', lineHeight: '2' }}>
+            {content.split('\n\n').map((paragraph, idx) => (
+              <div 
+                key={idx} 
+                style={{ 
+                  pageBreakInside: 'avoid', 
+                  breakInside: 'avoid', 
+                  marginBottom: '20px',
+                  whiteSpace: 'pre-wrap' 
+                }}
+              >
+                {paragraph}
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -1,53 +1,47 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════
-   MIND IN BOX — LOW-FOG GLASSMORPHISM DESIGN SYSTEM
+   MIND IN BOX — $40k DIGITAL LUXURY PARADIGM
    ═══════════════════════════════════════════════════ */
 
 :root {
-  /* Core palette (Dark Default) */
-  --bg-void:        #020202;
-  --bg-surface:     #080808;
-  --bg-elevated:    #0d0d0d;
+  /* DARK LUXURY THEME (Night Mode - Default) */
+  --bg-void:        #050505;
+  --bg-surface:     #0A0A0A;
+  --bg-elevated:    #111111;
 
-  /* Gold spectrum */
   --gold-pure:      #D4AF37;
   --gold-muted:     #A8892C;
   --gold-dim:       #6B5720;
-  --gold-glow:      rgba(212, 175, 55, 0.15);
-  --gold-border:    rgba(212, 175, 55, 0.18);
+  
+  --text-primary:   #FFFFFF;
+  --text-secondary: #A1A1AA;
+  --text-muted:     #71717A;
 
-  /* Text hierarchy */
-  --text-primary:   #F0EDE8;
-  --text-secondary: #9A948A;
-  --text-muted:     #4A4540;
-
-  /* Glass system */
-  --glass-bg:       rgba(8, 8, 8, 0.72);
-  --glass-border:   rgba(255, 255, 255, 0.07);
-  --glass-hover:    rgba(255, 255, 255, 0.04);
-  --glass-blur:     4px;   /* Low-Fog: user sees video clearly */
+  --glass-bg:       rgba(0, 0, 0, 0.3);
+  --glass-border:   rgba(255, 255, 255, 0.1);
+  --glass-blur:     24px;
+  --glass-shadow:   0 0 40px rgba(212, 175, 55, 0.05);
 }
 
-/* Day Theme (Luxurious Frosted White Glass & Muted Gold) */
 :root[data-theme="light"] {
-  --bg-void:        #F9F8F6;
+  /* LIGHT LUXURY THEME (Day Mode) */
+  --bg-void:        #F8F8F6;
   --bg-surface:     #F0EDE8;
   --bg-elevated:    #FFFFFF;
 
-  --gold-pure:      #B79332;
+  --gold-pure:      #B8860B;
   --gold-muted:     #8C7326;
   --gold-dim:       #D4AF37;
-  --gold-glow:      rgba(183, 147, 50, 0.15);
-  --gold-border:    rgba(183, 147, 50, 0.3);
+  
+  --text-primary:   #0A0A0A;
+  --text-secondary: #4B5563;
+  --text-muted:     #9CA3AF;
 
-  --text-primary:   #1A1A1A;
-  --text-secondary: #5A5A5A;
-  --text-muted:     #8A8A8A;
-
-  --glass-bg:       rgba(255, 255, 255, 0.6);
-  --glass-border:   rgba(183, 147, 50, 0.2);
-  --glass-hover:    rgba(255, 255, 255, 0.8);
+  --glass-bg:       rgba(255, 255, 255, 0.4);
+  --glass-border:   rgba(0, 0, 0, 0.05);
+  --glass-blur:     40px;
+  --glass-shadow:   0 20px 40px rgba(0, 0, 0, 0.05);
 }
 
 /* ── Base ─────────────────────────────────────────── */
@@ -66,7 +60,13 @@ body {
   -webkit-font-smoothing: antialiased;
   min-height: 100svh;
   overflow-x: hidden;
-  transition: background-color 0.8s ease, color 0.8s ease;
+}
+
+/* Ensure global transition for day/night metamorphosis over 500ms */
+*, body, main, div, span, p, h1, h2, h3, h4, h5, h6, input, button, textarea {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 500ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ── Typography ───────────────────────────────────── */
@@ -83,40 +83,25 @@ body {
   backdrop-filter: blur(var(--glass-blur)) saturate(160%);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
   border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
-.glass-gold {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  border: 1px solid var(--gold-border);
-  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.06) inset;
+/* Interaction States for Glass */
+.glass:hover {
+  background: rgba(0, 0, 0, 0.4);
+  border-color: rgba(212, 175, 55, 0.3);
 }
-
-.glass-card {
-  background: rgba(10, 10, 10, 0.68);
-  backdrop-filter: blur(6px) saturate(150%);
-  -webkit-backdrop-filter: blur(6px) saturate(150%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-top-color: rgba(255, 255, 255, 0.1);
-  border-left-color: rgba(255, 255, 255, 0.1);
-}
-:root[data-theme="light"] .glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(183, 147, 50, 0.2);
+:root[data-theme="light"] .glass:hover {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(184, 134, 11, 0.2);
 }
 
 /* ── Gold Glow Effects ────────────────────────────── */
-.glow-gold {
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.2),
-              0 0 60px rgba(212, 175, 55, 0.08);
-}
-
 .glow-gold-text {
-  text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+  text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
 }
 :root[data-theme="light"] .glow-gold-text {
-  text-shadow: none;
+  text-shadow: 0 0 15px rgba(184, 134, 11, 0.2);
 }
 
 .gold-gradient {
@@ -130,7 +115,7 @@ body {
   background-clip: text;
 }
 :root[data-theme="light"] .gold-gradient-text {
-  background: linear-gradient(135deg, #B79332 0%, #8C7326 100%);
+  background: linear-gradient(135deg, #B8860B 0%, #8C7326 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -152,51 +137,13 @@ body {
   50%       { opacity: 1;   box-shadow: 0 0 14px rgba(212,175,55,0.8); }
 }
 
-@keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
-@keyframes unlockPulse {
-  0%   { transform: scale(1);    opacity: 0.7; }
-  50%  { transform: scale(1.08); opacity: 1;   }
-  100% { transform: scale(1);    opacity: 0.7; }
-}
-
-@keyframes videoReveal {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.fade-in      { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.fade-in-up   { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.fade-in      { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.fade-in-up   { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .pulse-gold   { animation: pulseGold 2.5s ease-in-out infinite; }
-.unlock-pulse { animation: unlockPulse 2s ease-in-out infinite; }
-
-.shimmer {
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(212,175,55,0.15) 50%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 2.5s infinite;
-}
 
 /* ── Utility ──────────────────────────────────────── */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-
-.noise-overlay {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.028;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-}
-:root[data-theme="light"] .noise-overlay {
-  opacity: 0.05;
-  mix-blend-mode: multiply;
-}
 
 /* ── Selection ────────────────────────────────────── */
 ::selection {
@@ -207,36 +154,14 @@ body {
 /* ── Print Styles for Discharge Sanctuary ─────────── */
 @media print {
   body {
-    background: white !important;
-    color: black !important;
+    background: #FFFFFF !important;
+    color: #000000 !important;
   }
   * {
     box-shadow: none !important;
     text-shadow: none !important;
     background: transparent !important;
-    color: black !important;
+    color: #000000 !important;
   }
-  .print-hide {
-    display: none !important;
-  }
-  .print-show {
-    display: block !important;
-  }
-  .manuscript-print {
-    margin: 2cm !important;
-    font-family: Georgia, serif !important;
-    font-size: 16pt !important;
-    line-height: 2 !important;
-    text-align: right !important;
-    white-space: pre-wrap !important;
-    direction: rtl !important;
-  }
-  .manuscript-title {
-    font-size: 24pt !important;
-    font-weight: bold !important;
-    margin-bottom: 2cm !important;
-    text-align: center !important;
-    border-bottom: 2px solid black !important;
-    padding-bottom: 10px !important;
-  }
+  .print-hide { display: none !important; }
 }

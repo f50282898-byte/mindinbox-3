@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Sparkles,
+  
   User,
   Send,
   X,
@@ -361,7 +361,7 @@ export default function UtopianCity() {
         <div className="relative p-8 md:p-12">
           {/* Badge */}
           <div className="flex items-center gap-2 mb-6">
-            <Sparkles size={14} style={{ color: 'var(--gold-pure)' }} />
+            <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold-pure)] shadow-[0_0_8px_var(--gold-pure)]" />
             <span
               className="text-[11px] tracking-[0.25em] uppercase font-serif"
               style={{ color: 'var(--gold-muted)' }}
@@ -797,3 +797,4 @@ export default function UtopianCity() {
     </div>
   );
 }
+

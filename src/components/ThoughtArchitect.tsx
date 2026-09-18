@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, Layers, ArrowRight, Check, BookOpen } from 'lucide-react';
+import {  Layers, ArrowRight, Check, BookOpen } from 'lucide-react';
 
 interface StructuredFramework {
   title: string;
@@ -100,7 +100,7 @@ export default function ThoughtArchitect() {
             disabled={!rawThought.trim() || isSynthesizing}
             className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#AA7C11] to-[#D4AF37] text-black text-xs font-bold hover:brightness-110 disabled:opacity-40 transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.2)]"
           >
-            <Sparkles size={14} />
+            <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold-pure)] shadow-[0_0_8px_var(--gold-pure)]" />
             <span>{isSynthesizing ? 'جارٍ صياغة الإطار الفلسفي...' : 'هندسة الفكرة'}</span>
           </button>
         </div>
@@ -137,4 +137,5 @@ export default function ThoughtArchitect() {
     </div>
   );
 }
+
 

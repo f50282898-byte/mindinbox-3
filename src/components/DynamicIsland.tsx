@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Sparkles, Compass, Landmark, Feather, Users,
+   Compass, Landmark, Feather, Users,
   Check, Edit2, Crown, ChevronDown,
   LogOut, User, Lock, Zap, Brain, Mic, FileText,
   X, Settings
@@ -164,7 +164,7 @@ export default function DynamicIsland() {
             {/* ── Logo ── */}
             <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group shrink-0 min-w-0">
               <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#AA7C11]/30 to-black border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37] group-hover:scale-110 transition-transform duration-300">
-                <Sparkles size={14} className="sm:w-4 sm:h-4" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold-pure)] shadow-[0_0_8px_var(--gold-pure)]" />
                 {/* Ambient pulse ring */}
                 <span className="absolute inset-0 rounded-full border border-[#D4AF37]/30 animate-ping opacity-40" />
               </div>
@@ -499,3 +499,4 @@ export default function DynamicIsland() {
     </>
   );
 }
+

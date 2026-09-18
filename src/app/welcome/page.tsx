@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ArrowLeft, KeyRound } from 'lucide-react';
+import {  ArrowLeft, KeyRound } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -80,7 +80,7 @@ export default function WelcomeLeadMagnet() {
         className="mb-12 text-center"
       >
         <div className="inline-flex items-center gap-2 mb-4">
-          <Sparkles size={16} className="text-[var(--gold-pure)] unlock-pulse" />
+          <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold-pure)] shadow-[0_0_8px_var(--gold-pure)] unlock-pulse" />
           <span className="font-serif text-[10px] tracking-widest text-[var(--gold-muted)] uppercase">
             اختبار الهوية الفلسفية
           </span>
@@ -181,4 +181,5 @@ export default function WelcomeLeadMagnet() {
     </div>
   );
 }
+
 

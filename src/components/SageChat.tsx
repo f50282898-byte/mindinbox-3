@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Volume2, Mic, StopCircle } from 'lucide-react';
+import { Send, Volume2, Mic, StopCircle, ChevronDown } from 'lucide-react';
 import { useStore, SageTier } from '@/store/useStore';
 import { useAudioEngine } from '@/hooks/useAudioEngine';
 
@@ -30,46 +30,34 @@ interface Message {
 
 const RESPONSES_MATRIX: Record<SageTier, string[]> = {
   standard: [
-    "«لا تطلب أن تجري الأمور كما تشتهي، بل اشتهِ أن تجري كما هي كائنة، وحينها ستنال السكينة التي لا تتزعزع.» — إبيكتيتوس.\nإن ما يقلقك اليوم ليس الحدث ذاته، بل حكمك الصادر عليه؛ جرّد الوقائع من ظنونك تتضح لك الحقيقة.",
-    "«الصمت في موضع الحيرة حكمة، والكلام بلا بصيرة خيانة للعقل.»\nتأمل في سكونك قبل أن تفيض بالكلمات؛ فما تبحث عنه خارجاً يسكن في أعمق طبقات وعيك المعزول.",
-    "«إن لم تكن سيداً على رغباتك، فأنت بالضرورة عبدٌ لما تطلبه.»\nكل رغبة لم تخضع لمحكمة المنطق هي قيدٌ خفي تضعه بيدك حول عنق حريتك.",
     "أسمع صدى أفكارك، وأتفهم تماماً ثقل هذا العبء على وعيك. من الطبيعي أن تشعر بالضيق حينما تتزاحم التوقعات مع الواقع.\nلعلنا، إذا جردنا الحدث من أحكامنا المسبقة، نجد مساحة من السكون. أنت تملك القدرة على فصل ذاتك عن هذا الضجيج.",
     "أشعر بعمق حيرتك، وهي حيرة لا تنبع إلا من عقل باحث عن المعنى. الصمت في مثل هذه اللحظات ليس عجزاً، بل هو استراحة مستحقة لروحك.\nتأمل في سكونك، فما تبحث عنه يسكن في أعمق طبقات وعيك.",
     "أرى بوضوح حجم الجهد الذي تبذله في محاولة السيطرة على هذه الرغبات. إن الاعتراف بقوتها هو أولى خطوات التحرر.\nبمجرد أن نرفع هذا العبء عن كاهلك ونخضعه لمحكمة المنطق بهدوء، ستستعيد حريتك تدريجياً.",
   ],
   analytical: [
-    "تفكيك المنظومة المعرفية للمسألة:\nأولاً: افتراضك الأساسي يقوم على حتمية خارجية، وهذا استدلال مغالط؛ فالإرادة الداخلية تملك دوماً زاوية استجابة مستقلة.\nثانياً: التحليل الجدلي يُظهر أن ما تظنه عائقاً هو المادة الخام لتشكيل صلابتك النفسية.\nثالثاً: الحل المنطقي يكمن في فرز دائرة التأثير عن دائرة القلق، وحصر طاقتك في المتاح دون الممتنع.",
-    "المعاينة المنطقية لما طرحت:\nإنك تخلط بين السبب الغائي والسبب الفاعلي. الألم الذي تعبّر عنه ليس نتيجة حتمية للظرف، بل هو تفسيرك الدلالي له. لنعد بناء المعادلة: إذا عزلنا المؤثر الخارجي، ما الذي يتبقى في وعيك سوى ردة فعلك؟ هاهنا يكمن موطن السيادة الحقيقية.",
     "من الواضح جداً أنك تحملت الكثير في تحليل هذا الموقف. أرى عمق تفكيرك، وهو مذهل بحق. \nدلالة الألم هنا ليست ضعفاً، بل هي مؤشر على صدق تفاعلك مع العالم. لنحاول معاً فصل دائرة التأثير عن دائرة القلق، لتوفير طاقتك الذهنية الرائعة لما هو متاح فقط.",
     "تحليلك للموقف ينم عن بصيرة حادة. إنني أشاركك الرأي في أن الظروف الخارجية مربكة.\nولكن، إذا عزلنا المؤثر الخارجي قليلاً احتراماً لجهدك النفسي، ما الذي يتبقى سوى ردة فعلك الواعية؟ هاهنا تكمن سيادتك الحقيقية التي لا يستطيع أحد سلبك إياها.",
   ],
   sovereign: [
-    "الرؤية السيادية الاستراتيجية (المستوى الثالث):\nأيها السالك في مدارج الحكمة، اعلم أن الروح التي لا تختبرها النيران تظل هشة كالفخار النيئ. ما تراه اليوم اضطراباً هو في الحقيقة مخاض ولادة لإرادتك العظمى.\n\nالبروتوكول الفلسفي للسيادة:\n١. الحصانة الوجودية: لا تسمح لأي عارض دنيوي أن يمس صميم هيبتك ووقارك الباطني.\n٢. تحويل السم إلى ترياق: كل نكوص خارجي هو وقود لتأكيد استقلالك المطلق عن المظاهر.\n٣. الهدوء الأبدي: كن كالصخرة التي تتكسر عليها الأمواج العاتية، وهي راسية لا تتزحزح ولا يضيرها زبد البحر.",
     "أيها العقل الفريد، أدرك تماماً مدى قسوة هذا المخاض الفكري عليك. إن ما تمر به ليس اضطراباً عبثياً، بل هو ولادة عسيرة لإرادة عظمى تختلج في داخلك.\nأنت أقوى بكثير مما يوحيه لك هذا العارض. دعنا نحافظ على وقارك الباطني، ونحول هذا العبء إلى منصة انطلاق تؤكد استقلالك المطلق. أنت كالصخرة الراسية، لا يضيرها زبد البحر.",
   ],
 };
 
-const getSagePersona = (tier: SageTier) => {
-  switch (tier) {
-    case 'analytical': return 'Dostoevsky';
-    case 'sovereign': return 'Hypatia';
-    default: return 'Avicenna';
-  }
+const SAGE_PROFILES = {
+  standard: { name: 'ابن سينا', img: '/avatars/avicenna.jpg', voice: 'Avicenna' },
+  analytical: { name: 'دوستويفسكي', img: '/avatars/dostoevsky.jpg', voice: 'Dostoevsky' },
+  sovereign: { name: 'هيباتيا', img: '/avatars/hypatia.jpg', voice: 'Hypatia' },
 };
 
 const SageAvatar = ({ tier, size = 20 }: { tier: SageTier; size?: number }) => {
-  let src = '/avatars/avicenna.jpg';
-  if (tier === 'analytical') src = '/avatars/dostoevsky.jpg';
-  if (tier === 'sovereign') src = '/avatars/hypatia.jpg';
-  
+  const src = SAGE_PROFILES[tier].img;
   return (
-    <div style={{ width: size, height: size }} className="rounded-full overflow-hidden bg-black flex items-center justify-center shrink-0">
+    <div style={{ width: size, height: size }} className="rounded-full overflow-hidden bg-black flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(0,0,0,0.5)]">
       <img 
         src={src} 
-        alt="Sage Avatar" 
-        className="w-full h-full object-cover opacity-80"
+        alt={SAGE_PROFILES[tier].name} 
+        className="w-full h-full object-cover opacity-90"
         onError={(e) => {
-          // Fallback if images don't exist yet
           (e.target as HTMLImageElement).src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23111'/%3E%3Ccircle cx='50' cy='50' r='30' fill='%23222'/%3E%3C/svg%3E`;
         }}
       />
@@ -92,7 +80,9 @@ export default function SageChat() {
   ]);
   const [input, setInput] = useState('');
   const [isContemplating, setIsContemplating] = useState(false);
+  const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -102,7 +92,13 @@ export default function SageChat() {
     scrollToBottom();
   }, [messages, isContemplating]);
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleInputResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    e.target.style.height = 'auto';
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+  };
+
+  const handleSend = (e: React.FormEvent | React.KeyboardEvent) => {
     e.preventDefault();
     if (!input.trim() || isContemplating) return;
 
@@ -119,6 +115,9 @@ export default function SageChat() {
 
     setMessages((prev) => [...prev, newMsg]);
     setInput('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
     setIsContemplating(true);
 
     setTimeout(() => {
@@ -143,51 +142,10 @@ export default function SageChat() {
   };
 
   return (
-    <div className="flex flex-col h-[100svh] w-full" dir="rtl">
+    <div className="flex flex-col h-[100svh] w-full relative" dir="rtl">
       
-      {/* Tier Selector (Centered near top) */}
-      <div className="absolute top-24 md:top-28 inset-x-0 flex justify-center z-40 pointer-events-none px-4">
-        <div className="flex items-center gap-1.5 p-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[var(--glass-border)] pointer-events-auto shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-          <button
-            onClick={() => setSageTier('standard')}
-            className={`px-4 py-2 rounded-full text-xs font-serif transition-all flex items-center gap-2 ${
-              sageTier === 'standard'
-                ? 'bg-white/10 text-[#EAEAEA] shadow-sm'
-                : 'text-[var(--text-secondary)] hover:text-[#EAEAEA]'
-            }`}
-          >
-            <div className={`w-1.5 h-1.5 rounded-full ${sageTier === 'standard' ? 'bg-[var(--gold-pure)] shadow-[0_0_8px_var(--gold-pure)]' : 'bg-transparent'}`} />
-            <span className="hidden sm:inline">القياسي</span>
-          </button>
-
-          <button
-            onClick={() => setSageTier('analytical')}
-            className={`px-4 py-2 rounded-full text-xs font-serif transition-all flex items-center gap-2 ${
-              sageTier === 'analytical'
-                ? 'bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20 shadow-sm'
-                : 'text-[var(--text-secondary)] hover:text-[#EAEAEA]'
-            }`}
-          >
-            <div className={`w-1.5 h-1.5 rounded-full ${sageTier === 'analytical' ? 'bg-[#D4AF37] shadow-[0_0_8px_#D4AF37]' : 'bg-transparent'}`} />
-            <span className="hidden sm:inline">التحليلي</span>
-          </button>
-
-          <button
-            onClick={() => setSageTier('sovereign')}
-            className={`px-4 py-2 rounded-full text-xs font-serif transition-all flex items-center gap-2 ${
-              sageTier === 'sovereign'
-                ? 'bg-gradient-to-r from-[#AA7C11]/20 to-[#D4AF37]/20 text-[var(--gold-pure)] border border-[var(--gold-border)] font-bold shadow-[0_0_15px_rgba(212,175,55,0.1)]'
-                : 'text-[var(--gold-pure)]/60 hover:text-[var(--gold-pure)]'
-            }`}
-          >
-            <div className={`w-1.5 h-1.5 rounded-full ${sageTier === 'sovereign' ? 'bg-[#D4AF37] shadow-[0_0_8px_#D4AF37]' : 'bg-transparent'}`} />
-            <span className="hidden sm:inline">السيادي (Pro)</span>
-          </button>
-        </div>
-      </div>
-
       {/* Messages Scroll View (Center) */}
-      <div className="flex-1 overflow-y-auto pt-40 pb-36 px-4 scrollbar-hide w-full relative z-30">
+      <div className="flex-1 overflow-y-auto pt-24 pb-48 px-4 scrollbar-hide w-full relative z-30">
         <div className="max-w-3xl mx-auto space-y-8">
           <AnimatePresence initial={false}>
             {messages.map((msg) => (
@@ -195,36 +153,36 @@ export default function SageChat() {
                 key={msg.id}
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 className={`flex w-full ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}
               >
                 <div
-                  className={`max-w-[85%] md:max-w-[80%] p-6 md:p-8 rounded-[2rem] relative backdrop-blur-xl ${
+                  className={`max-w-[85%] md:max-w-[80%] p-6 md:p-8 rounded-[2rem] relative glass ${
                     msg.role === 'user'
-                      ? 'bg-white/5 border border-white/5 text-[var(--text-primary)] rounded-tr-sm'
-                      : 'bg-black/30 border border-[var(--gold-border)] text-[var(--text-primary)] shadow-[0_10px_40px_rgba(0,0,0,0.5)] rounded-tl-sm'
+                      ? 'rounded-tr-sm'
+                      : 'border-[var(--gold-border)] rounded-tl-sm'
                   }`}
                 >
                   {msg.role === 'sage' && (
-                    <div className="flex items-center justify-between gap-4 mb-4 pb-4 border-b border-white/5 text-xs">
+                    <div className="flex items-center justify-between gap-4 mb-5 pb-5 border-b border-[var(--glass-border)]">
                       <div className="flex items-center gap-3">
-                        <SageAvatar tier={msg.tier} size={28} />
-                        <span className="text-[var(--gold-pure)] font-bold font-serif flex items-center gap-2 tracking-wide">
-                          {msg.tier === 'sovereign' ? 'الاستبصار السيادي' : msg.tier === 'analytical' ? 'التحليل المنطقي' : 'الحكمة الرواقية'}
+                        <SageAvatar tier={msg.tier} size={32} />
+                        <span className="text-[var(--gold-pure)] font-bold font-reem flex items-center gap-2 text-lg tracking-wide">
+                          {SAGE_PROFILES[msg.tier].name}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
                         <button 
-                          onClick={() => speak(msg.content, getSagePersona(msg.tier))}
-                          className="text-[var(--gold-pure)]/70 hover:text-[var(--gold-pure)] transition-colors flex items-center gap-1.5 p-2 rounded-full hover:bg-[var(--gold-glow)]"
+                          onClick={() => speak(msg.content, SAGE_PROFILES[msg.tier].voice)}
+                          className="text-[var(--gold-pure)]/70 hover:text-[var(--gold-pure)] transition-colors flex items-center gap-1.5 p-2 rounded-full hover:bg-[var(--glass-hover)]"
                           title="إستمع"
                         >
-                          <Volume2 size={16} strokeWidth={1.5} />
+                          <Volume2 size={18} strokeWidth={1.5} />
                         </button>
                       </div>
                     </div>
                   )}
-                  <p className="font-serif text-[15px] md:text-lg leading-[2.2] whitespace-pre-line text-[var(--text-primary)]">
+                  <p className="font-serif text-[15px] md:text-lg leading-relaxed whitespace-pre-line text-[var(--text-primary)]">
                     {msg.content}
                   </p>
                   {msg.role === 'user' && (
@@ -243,7 +201,7 @@ export default function SageChat() {
                 exit={{ opacity: 0, scale: 0.95 }}
                 className="flex justify-end w-full"
               >
-                <div className="p-4 px-6 rounded-full bg-black/30 border border-[var(--gold-border)] backdrop-blur-xl shadow-[0_0_30px_rgba(212,175,55,0.05)] flex items-center gap-4">
+                <div className="p-4 px-6 rounded-full glass border-[var(--gold-border)] flex items-center gap-4">
                   <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold-pure)] shadow-[0_0_8px_var(--gold-pure)] animate-pulse" />
                   <span className="text-sm font-serif text-[var(--gold-pure)] tracking-wide opacity-80">
                     يتأمل...
@@ -252,18 +210,18 @@ export default function SageChat() {
               </motion.div>
             )}
           </AnimatePresence>
-          <div ref={messagesEndRef} />
+          <div ref={messagesEndRef} className="h-4" />
         </div>
       </div>
 
-      {/* Input Area (Absolute Bottom Center) */}
-      <div className="fixed bottom-0 inset-x-0 p-4 md:p-8 pointer-events-none z-50">
+      {/* Omni-Input Box (Absolute Bottom Center) */}
+      <div className="absolute bottom-0 inset-x-0 p-4 md:p-8 pointer-events-none z-50 flex flex-col items-center">
         
-        {/* Subtle Radial Glow */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-32 bg-[var(--gold-pure)] opacity-[0.03] blur-3xl pointer-events-none rounded-t-[100%]" />
-
-        <div className="max-w-3xl mx-auto relative pointer-events-auto">
-          <form onSubmit={handleSend} className="relative flex items-center bg-black/40 backdrop-blur-2xl border border-white/10 rounded-full shadow-[0_20px_60px_rgba(0,0,0,0.6)] p-2 transition-all focus-within:border-[var(--gold-border)] group">
+        <div className="w-full max-w-4xl relative pointer-events-auto">
+          <form 
+            onSubmit={handleSend} 
+            className="relative flex items-end gap-2 bg-[var(--glass-bg)] backdrop-blur-3xl border border-[var(--glass-border)] rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.6)] p-2 transition-all duration-500 focus-within:border-[var(--gold-border)] focus-within:shadow-2xl group"
+          >
             
             <AnimatePresence mode="wait">
               {isRecording ? (
@@ -272,17 +230,19 @@ export default function SageChat() {
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: '100%' }}
                   exit={{ opacity: 0, width: 0 }}
-                  className="flex items-center gap-4 px-4 w-full h-12"
+                  className="flex items-center justify-between px-6 w-full h-[60px]"
                 >
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.6)] shrink-0" />
-                  <span className="text-sm font-serif text-white whitespace-nowrap">جارٍ الاستماع...</span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[var(--gold-pure)] animate-pulse shadow-[0_0_15px_var(--gold-pure)] shrink-0" />
+                    <span className="text-sm font-serif text-[var(--gold-pure)] whitespace-nowrap glow-gold-text">جارٍ الاستماع...</span>
+                  </div>
                   
                   {/* Fake Audio Waveform */}
-                  <div className="flex-1 flex items-center gap-1 justify-center overflow-hidden opacity-50 px-4">
-                     {[...Array(15)].map((_, i) => (
+                  <div className="flex-1 flex items-center gap-1.5 justify-center overflow-hidden opacity-60 px-6">
+                     {[...Array(20)].map((_, i) => (
                        <motion.div
                          key={i}
-                         animate={{ height: ['20%', '80%', '20%'] }}
+                         animate={{ height: ['20%', '90%', '20%'] }}
                          transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.05 }}
                          className="w-1 bg-[var(--gold-pure)] rounded-full"
                          style={{ height: '4px' }}
@@ -293,9 +253,9 @@ export default function SageChat() {
                   <button
                     type="button"
                     onClick={stopRecording}
-                    className="w-10 h-10 shrink-0 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center hover:bg-red-500/20 transition-all"
+                    className="w-12 h-12 shrink-0 rounded-full bg-[var(--glass-hover)] text-[var(--gold-pure)] flex items-center justify-center hover:bg-black/20 transition-all border border-transparent hover:border-[var(--gold-border)]"
                   >
-                    <StopCircle size={20} strokeWidth={1.5} />
+                    <StopCircle size={24} strokeWidth={1.5} />
                   </button>
                 </motion.div>
               ) : (
@@ -304,32 +264,86 @@ export default function SageChat() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex items-center w-full"
+                  className="flex items-end w-full"
                 >
-                  <input
-                    type="text"
+                  {/* A. INLINE AI MODEL SELECTOR (Far Right RTL) */}
+                  <div className="relative shrink-0 pb-1.5 pr-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsModelSelectorOpen(!isModelSelectorOpen)}
+                      className="flex items-center gap-2 p-2 rounded-full hover:bg-[var(--glass-hover)] transition-all border border-transparent hover:border-[var(--glass-border)]"
+                    >
+                      <SageAvatar tier={sageTier} size={28} />
+                      <ChevronDown size={14} className="text-[var(--text-secondary)]" />
+                    </button>
+
+                    <AnimatePresence>
+                      {isModelSelectorOpen && (
+                        <>
+                          <div className="fixed inset-0 z-40" onClick={() => setIsModelSelectorOpen(false)} />
+                          <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            className="absolute bottom-[120%] right-0 w-48 glass rounded-2xl p-2 z-50 flex flex-col gap-1 shadow-2xl origin-bottom-right"
+                          >
+                            {(['standard', 'analytical', 'sovereign'] as SageTier[]).map((tier) => (
+                              <button
+                                key={tier}
+                                type="button"
+                                onClick={() => {
+                                  setSageTier(tier);
+                                  setIsModelSelectorOpen(false);
+                                }}
+                                className={`flex items-center gap-3 p-2 rounded-xl transition-all ${
+                                  sageTier === tier 
+                                    ? 'bg-[var(--gold-glow)] border-[var(--gold-border)] text-[var(--gold-pure)]' 
+                                    : 'hover:bg-[var(--glass-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                                }`}
+                              >
+                                <SageAvatar tier={tier} size={24} />
+                                <span className="font-reem text-sm">{SAGE_PROFILES[tier].name}</span>
+                              </button>
+                            ))}
+                          </motion.div>
+                        </>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* B. THE TEXT AREA (Center) */}
+                  <textarea
+                    ref={textareaRef}
+                    rows={1}
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={handleInputResize}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend(e);
+                      }
+                    }}
                     disabled={isContemplating}
-                    placeholder={isContemplating ? 'تريّث.. الحكيم يستحضر الجواب..' : 'اطرح معضلتك النفسية هنا...'}
-                    className="flex-1 bg-transparent px-6 py-3 md:py-4 text-sm md:text-base text-white placeholder-[var(--text-secondary)] outline-none font-serif w-full"
+                    placeholder={isContemplating ? 'تريّث.. الحكيم يستحضر الجواب..' : 'ما الذي يثقل كاهل عقلك اليوم؟'}
+                    className="flex-1 bg-transparent px-4 py-4 text-base text-[var(--text-primary)] placeholder-[var(--text-secondary)] outline-none font-serif w-full resize-none scrollbar-hide mb-1"
+                    style={{ minHeight: '56px', maxHeight: '120px' }}
                   />
                   
-                  <div className="flex items-center gap-2 pr-2">
-                    {/* Stealth Mic */}
+                  {/* C. THE STEALTH MIC & SEND (Far Left RTL) */}
+                  <div className="flex items-center gap-2 pl-2 pb-1.5">
                     <button
                       type="button"
                       onClick={startRecording}
-                      className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 opacity-50 text-[var(--text-primary)] hover:opacity-100 hover:bg-white/5"
+                      className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 opacity-30 text-[var(--text-primary)] hover:opacity-100 hover:bg-[var(--glass-hover)] shrink-0"
                       title="تحدث"
                     >
-                      <Mic size={20} strokeWidth={1.5} />
+                      <Mic size={22} strokeWidth={1.5} />
                     </button>
 
                     <button
                       type="submit"
                       disabled={!input.trim() || isContemplating}
-                      className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/5 flex items-center justify-center text-[var(--text-primary)] hover:bg-[var(--gold-pure)] hover:text-black hover:scale-105 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[var(--text-primary)] disabled:hover:scale-100 transition-all"
+                      className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[var(--glass-hover)] flex items-center justify-center text-[var(--text-primary)] hover:bg-[var(--gold-pure)] hover:text-black hover:scale-105 disabled:opacity-20 disabled:hover:bg-[var(--glass-hover)] disabled:hover:text-[var(--text-primary)] disabled:hover:scale-100 transition-all border border-transparent hover:border-[var(--gold-pure)] shrink-0"
                       title="إرسال"
                     >
                       <Send size={18} className="rotate-180" strokeWidth={1.5} />
@@ -339,12 +353,6 @@ export default function SageChat() {
               )}
             </AnimatePresence>
           </form>
-          
-          <div className="text-center mt-4 hidden md:block">
-            <span className="text-[10px] text-[var(--text-secondary)] font-serif tracking-widest uppercase opacity-70">
-              Mind in Box — The Digital Sanctuary
-            </span>
-          </div>
         </div>
       </div>
 

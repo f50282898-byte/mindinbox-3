@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Lock, Sparkles, X } from 'lucide-react';
+import { Lock,  X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/store/useStore';
 import { cn } from '@/lib/utils';
@@ -84,7 +84,7 @@ export default function GoldenLock({ children, featureName, description }: Golde
 
               <div className="flex flex-col items-center text-center space-y-6 relative z-10">
                 <div className="w-16 h-16 rounded-full bg-[#0A0A0A] flex items-center justify-center border border-[#D4AF37]/30 text-[#D4AF37] mb-2 shadow-[0_0_20px_rgba(212,175,55,0.2)]">
-                  <Sparkles size={28} />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[var(--gold-pure)] shadow-[0_0_12px_var(--gold-pure)]" />
                 </div>
                 
                 <h3 className="text-3xl font-light text-[#EAEAEA] font-serif">
@@ -126,4 +126,5 @@ export default function GoldenLock({ children, featureName, description }: Golde
     </>
   );
 }
+
 

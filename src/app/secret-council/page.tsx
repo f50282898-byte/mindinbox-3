@@ -8,7 +8,7 @@ import {
   Send, 
   ShieldCheck, 
   KeyRound, 
-  Sparkles, 
+   
   User, 
   Radio, 
   Clock,
@@ -342,4 +342,5 @@ export default function SecretCouncil() {
     </div>
   );
 }
+
 

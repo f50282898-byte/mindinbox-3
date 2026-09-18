@@ -28,6 +28,9 @@ interface AppState {
   toggleSidebar: () => void;
   audioSpeed: number;
   setAudioSpeed: (speed: number) => void;
+  theme: 'dark' | 'light';
+  setTheme: (theme: 'dark' | 'light') => void;
+  userPersona: string;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -38,6 +41,21 @@ export const useStore = create<AppState>((set) => ({
     phone: '',
     isPro: false,
   },
+  theme: 'dark',
+  setTheme: (theme) => {
+    set({ theme });
+    if (typeof document !== 'undefined') {
+      const root = document.documentElement;
+      if (theme === 'light') {
+        root.setAttribute('data-theme', 'light');
+        root.classList.remove('dark');
+      } else {
+        root.removeAttribute('data-theme');
+        root.classList.add('dark');
+      }
+    }
+  },
+  userPersona: 'المراقب الكوني',
   setDisplayName: (name: string) =>
     set((state) => ({ user: { ...state.user, displayName: name } })),
   setPhone: (phone: string) =>

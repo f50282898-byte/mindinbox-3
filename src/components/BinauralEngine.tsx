@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX, Sparkles, Radio } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX,  Radio } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 
 interface FrequencyPreset {
@@ -210,4 +210,5 @@ export default function BinauralEngine() {
     </div>
   );
 }
+
 
